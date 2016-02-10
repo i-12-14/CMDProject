@@ -97,6 +97,12 @@ public class CommandAnalyzerManager implements Analysable{
 		analyzers.iterator().next().addCommand(command);
 	}
 	
+	@Override
+	public void removeCommand(Command command) {
+		if(analyzers.size() == 0) return;
+		analyzers.iterator().next().removeCommand(command);
+	}
+	
 	/**
 	 * 处理一条用户输入的内容，将内容指派到维护的所有的CommandAnalyzer中去尝试处理，直到有人能够处理他
 	 * @param content 待识别的指令

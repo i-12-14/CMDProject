@@ -2,13 +2,9 @@ package com.congxiaoyao.cmd;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * 在这个类里解释一下这一整套所谓的框架的工作原理及使用方法
@@ -20,10 +16,10 @@ import java.util.Set;
  * 下面是小例子
  * 假设我们有命令定义如下		'help' '查看帮助信息'
  * 通过注解来绑定处理函数与命令，假设我们的处理方法写在了类Case中
- * <code>
+ * <hr><pre>
  * public class Case{
  * 
- * 		<code>@CommandName("help")</code>
+ * 		<code>@CommandName("help")
  * 		public void foo(){
  * 			//something to do when user input help
  * 		}
@@ -32,7 +28,7 @@ import java.util.Set;
  * 			new CommandAnalyzer(new Case()).process("help");
  * 		}
  * }
- * </code>
+ * </pre><hr>
  * 关于重载命令
  * 命令支持多参重载，回调处理函数的时候，会根据处理函数参数的个数及类型选择合适的处理函数进行回调
  * 当命令被识别出来后，会先去寻找参数个数与命令所携带的参数个数相等的处理函数回调之
@@ -42,7 +38,8 @@ import java.util.Set;
  * 会导致其多余的处理函数失效，请尽量避免重复
  * 
  * 关于可变参数命令
- * 想要拦截可变参数命令的回调，处理函数的参数可以是Command类型、多参的String类型（要正好与这次用户输入的参数个数匹配）、
+ * 可变参数命令是指在参数定义的时候并不关心准确的参数个数（paramCount要标为-1），用户输几个我就处理几个，这样的话
+ * 想要拦截可变参数命令，处理函数的参数可以是Command类型、多参且都是String类型（要正好与这次用户输入的参数个数匹配）、
  * String...类型。如果以Command作为参数类型，其对象中的paramCount为-1，请以parameters（String数组）的长度为准
  * 
  * 关于命令的动态申请，见{@code CommandAnalyzer#addCommand(Command)}方法
@@ -55,15 +52,16 @@ import java.util.Set;
  * 关于敏感参数拦截
  * 对于一参命令,其处理函数可以通过OnlyCare注解过滤掉其他的参数，只在用户输入她想要的参数时才会回调这个函数例如
  * 	
- * <code>@CommandName("screen")</code>
- * <code>@OnlyCare("max")</code>
- * <code>
+ * <hr><pre>
+ * <code>@CommandName("screen")
+ * <code>@OnlyCare("max")
  * public void maxSizeWindow(String arg) {
  * 		//只有用户输入 ‘screen max’ 的时候此函数才会被回调
  * 		//参数arg也可以不写
  * }
- * <code>
- * @version 1.0
+ * </pre><hr>
+ * 
+ * @version 1.1
  * @date 2016.1.19
  * @author congxiaoyao
  */
@@ -169,6 +167,9 @@ public class CommandAnalyzer implements Analysable
 	private void initMethodsMap() {
 		Method[] methods = invoker.getClass().getDeclaredMethods();
 		for (Method method : methods) {
+			//只处理public方法
+			int modifiers = method.getModifiers();
+			if (modifiers != 1 && modifiers != 9) continue;
 			//过滤掉没有注解的方法
 			if(!method.isAnnotationPresent(CommandName.class)) continue;
 			//获取上面的注解
@@ -424,6 +425,21 @@ public class CommandAnalyzer implements Analysable
 		int index = i + 1;
 		for(int size = commands.size();index < size;index++) {
 			if(command.equals(commands.get(index))) {
+				commands.remove(i);
+				break;
+			}
+		}
+		updateCommandsDirectory();
+	}
+	
+	@Override
+	public void removeCommand(Command command) {
+		if(command == null) return;
+		char key = command.commandName.charAt(0);
+		int[] sl = commandsDirectory.get(key);
+		int start = sl[0] , end = sl[1] + start;
+		for(int i=start;i<end;i++) {
+			if(command.equals(commands.get(i))) {
 				commands.remove(i);
 				break;
 			}

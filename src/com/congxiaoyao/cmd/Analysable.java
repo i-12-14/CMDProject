@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * 实现此接口的类代表着拥有通过框架流程处理一条用户输入的能力
  * 代表着能够提供作为解析器的一些方法功能
- * 所谓框架流程，是指先将一条用户输入识别为一条指令并创建Command对象来维护这些信息，再通过这个这个对象去寻找相依的处理函数进行处理
+ * 所谓通过框架流程处理，是指先将一条用户输入识别为一条指令并创建Command对象来维护这些信息，再通过这个这个对象去寻找相应的处理函数进行处理
  * 所以只要将用户输入传入{@code Analysable#process(String)}方法中，即可反射调用相应的处理函数完成处理
  * 其他方法用途见方法注释
  * 
@@ -35,6 +35,12 @@ public interface Analysable {
 	 * @param command
 	 */
 	public abstract void addCommand(Command command);
+	
+	/**
+	 * 从命令集合中移除一条命令
+	 * @param command
+	 */
+	public abstract void removeCommand(Command command);
 
 	/**
 	 * @return 所有命令的描述信息整理成String的形式返回

@@ -1,24 +1,29 @@
 package com.congxiaoyao.cmd;
 
-import javax.swing.JFrame;
-
 import com.congxiaoyao.cmd.CommandWindow.OnSubmitListener;
+
+import javax.swing.*;
 
 /**
  * 主要为了处理对CommandWindow的操作的命令，如清屏、退出、设置窗口大小提示语等
  * 正常的话这些处理函数应该耦合在CommandWindow所在的类中，这里主要是当做对cmd框架使用的一个简单demo
+ * 支持动态添加操作CommandWindow的命令，如果没有在相应文件中声明命令，可调用此函数添加
+ * @see #registerCommands(Analysable)
  * 
  * @author congxiaoyao
  * @date 2016.2.2
- * @version 1.0
+ * @version 1.1
  */
 public class CommandWindowHandler {
 	
 	private CommandWindow window;
-	private Analysable analyzer;
-	
+
 	public CommandWindowHandler(CommandWindow window) {
 		this.window = window;
+	}
+
+	private static Analysable getAnalyzer() {
+		return CommandAnalyzerManager.getInstance();
 	}
 	
 	/**
@@ -29,6 +34,18 @@ public class CommandWindowHandler {
 		window.closeWindow();
 	}
 	
+	@CommandName("restart")
+	public void restartWindow() {
+		window.closeWindow();
+		window = new CommandWindow().setVisible();
+		window.setOnSubmitListener(new OnSubmitListener() {
+			@Override
+			public void onSubmit(String content) {
+				getAnalyzer().process(content);
+			}
+		});
+	}
+	
 	@CommandName
 	public void handleVersion() {
 		System.out.println("1.0");
@@ -36,8 +53,8 @@ public class CommandWindowHandler {
 	
 	@CommandName
 	public void handle720P() {
-		analyzer.process("bound 1280 720");
-		analyzer.process("font 20");
+		CommandAnalyzerManager.getInstance().process("bound 1280 720");
+		getAnalyzer().process("font 20");
 	}
 	
 	/**
@@ -62,7 +79,7 @@ public class CommandWindowHandler {
 		window.setOnSubmitListener(new OnSubmitListener() {
 			@Override
 			public void onSubmit(String content) {
-				analyzer.process(content);
+				getAnalyzer().process(content);
 			}
 		});
 	}
@@ -79,7 +96,7 @@ public class CommandWindowHandler {
 		window.setOnSubmitListener(new OnSubmitListener() {
 			@Override
 			public void onSubmit(String content) {
-				analyzer.process(content);
+				getAnalyzer().process(content);
 			}
 		});
 	}
@@ -130,7 +147,7 @@ public class CommandWindowHandler {
 	
 	@CommandName
 	public void handleHelp() {
-		window.printlnSmoothly(analyzer.getCommandsDescription());
+		window.printlnSmoothly(getAnalyzer().getCommandsDescription());
 	}
 	
 	/**
@@ -140,13 +157,12 @@ public class CommandWindowHandler {
 	 */
 	@CommandName
 	public void handleHelp(String commandName) {
-		String result = analyzer.getCommandInfo(commandName);
+		String result = getAnalyzer().getCommandInfo(commandName);
 		window.printlnSmoothly(result);
 	}
 
 	public void registerCommands(Analysable analysable) {
-		analyzer = analysable;
-		
+
 		analysable.addCommand(new Command("720p",	"设置窗口尺寸为720P"));
 		analysable.addCommand(new Command("cls",	"清屏"));
 		analysable.addCommand(new Command("exit",	"退出"));
@@ -162,9 +178,5 @@ public class CommandWindowHandler {
 		analysable.addCommand(new Command("bound",	2,	"设置窗口宽高"));
 		
 		analysable.addCommand(new Command("hint",	1,		"`",	"设置hint文字"));
-	}
-	
-	public void setAnalyzer(Analysable analysable) {
-		analyzer = analysable;
 	}
 }

@@ -15,25 +15,30 @@ import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 
+import com.congxiaoyao.cmd.CodeAssistant.WeightedString;
+
 /**
  * 用JTextArea写成的仿windows的CMD窗口，作为CMD框架的一部分，主要负责UI方面的内容
- * 调用无参的构造函数实例化后，使用{@code setVisible}方法显示 关闭窗口情调用{@code closeWindow}方法
+ * 调用无参的构造函数实例化后，使用{@code CommandWindow#setVisible()}方法显示 关闭窗口情调用{@code closeWindow}方法
  * 用户输入的每一行合法内容都会以回调接口的形式通知外界 
  * @see OnSubmitListener#onSubmit(String)
+ * 支持代码提示功能，默认不开启，如需启用请构造{@code CodeAssistant}实例并传入
+ * @see #setAssistant(CodeAssistant)
+ * 按住ctrl+上下箭头可查看之前输入过的内容
  * 其他小功能请看类内共有方法的方法注释
- * @version 0.9
+ * @version 1.1
  * @author congxiaoyao
  * @date 2016.1.24
  */
 
 public class CommandWindow extends JFrame{
 
-	public static final long serialVersionUID = 100L;	//版本号
-
 	public static final KeyStroke ENTER = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0);
 	public static final KeyStroke BACK = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0);
 	public static final KeyStroke PASTE = KeyStroke.getKeyStroke(KeyEvent.VK_V,KeyEvent.CTRL_MASK);
 	public static final KeyStroke CUT = KeyStroke.getKeyStroke(KeyEvent.VK_X,KeyEvent.CTRL_MASK);
+	public static final KeyStroke ARROW_UP = KeyStroke.getKeyStroke(KeyEvent.VK_UP,KeyEvent.CTRL_MASK);
+	public static final KeyStroke ARROW_DOWN = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,KeyEvent.CTRL_MASK);
 	
 	public String HINT = "请输入>";
 	public String LFHINT = "\n请输入>";
@@ -44,6 +49,11 @@ public class CommandWindow extends JFrame{
 	private Font font = new Font("黑体", Font.BOLD, 15);
 
 	private PrintStream printStream;
+	
+	private RoundList<String> inputs = new RoundList<>(10);
+	private int inputsPointer = 0;
+	
+	private CodeAssistant assistant;
 	
 	private OnSubmitListener onSubmitListener;
 
@@ -183,6 +193,32 @@ public class CommandWindow extends JFrame{
 		}
 		return null;
 	}
+	
+	/**
+	 * @return 用户在最后一行的输入
+	 */
+	private String getLastInput(String lastLine) {
+		if(lastLine == null) {
+			lastLine = getLastLine();
+		}
+		if(lastLine.length() == 0) return "";
+		return lastLine.substring(LEN_HINT, lastLine.length());
+	}
+	
+	/**
+	 * 替换掉用户输入的部分为content，也就是最后一行的内容（不包含hint）
+	 * @param content
+	 */
+	private void replaceInputing(String content) {
+		try {
+			int offset = textArea.getLineStartOffset(textArea.getLineCount()-1);
+			textArea.getDocument().remove(offset, getTextLength() - offset);
+			textArea.append(HINT);
+			textArea.append(content);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 设置控制台高度
@@ -233,6 +269,18 @@ public class CommandWindow extends JFrame{
 	public CommandWindow setVisible() {
 		setVisible(true);
 		return this;
+	}
+	
+	/**
+	 * 设置一个窗口的大小并让其居中显示
+	 * @param width frame宽度
+	 * @param height frame高度
+	 */
+	public void setBounds(int width ,int height)
+	{
+		Dimension scrSize=Toolkit.getDefaultToolkit().getScreenSize();   
+		setBounds((int) (scrSize.getWidth()-width)/2, (int) (scrSize.getHeight()-height)/2  
+				,width, height);
 	}
 	
 	/**
@@ -305,21 +353,13 @@ public class CommandWindow extends JFrame{
 	public int getFontSize() {
 		return font.getSize();
 	}
+	
+	public void setAssistant(CodeAssistant assistant) {
+		this.assistant = assistant;
+	}
 
 	public void setOnSubmitListener(OnSubmitListener onSubmitListener) {
 		this.onSubmitListener = onSubmitListener;
-	}
-	
-	/**
-	 * 设置一个窗口的大小并让其居中显示
-	 * @param width frame宽度
-	 * @param height frame高度
-	 */
-	public void setBounds(int width ,int height)
-	{
-		Dimension scrSize=Toolkit.getDefaultToolkit().getScreenSize();   
-		setBounds((int) (scrSize.getWidth()-width)/2, (int) (scrSize.getHeight()-height)/2  
-				,width, height);
 	}
 	
 	private class CMDTextArea extends JTextArea {
@@ -338,7 +378,7 @@ public class CommandWindow extends JFrame{
 		@Override
 		protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
 			if(condition != 0) return false;
-			//先检查这一行的提示符是否存在
+			//先检查最后一行的提示符是否存在
 			String lastLine = getLastLine();
 			if(lastLine.length() < HINT.length() && can) {
 				textArea.append(HINT);
@@ -346,16 +386,37 @@ public class CommandWindow extends JFrame{
 				if(ks.equals(ENTER)) return false;
 				return processKeyBinding(ks, e, condition, pressed);
 			}
+			//拦截ctrl+上箭头、下箭头
+			if(ks.equals(ARROW_UP)) {
+				if(inputs.size() > 0) {
+					replaceInputing(inputs.getAllowsNegativeIndex(--inputsPointer));
+					moveCaretToBottom();
+				}
+			}else if(ks.equals(ARROW_DOWN)) {
+				if(inputs.size() > 0) {
+					replaceInputing(inputs.getAllowsNegativeIndex(++inputsPointer));
+					moveCaretToBottom();
+				}
+			}
 			//拦截回车
 			if(ks.equals(ENTER)) {
+				//如果处于代码提示状态
+				if(isSelecting() && assistant !=null) {
+					int len = getTextLength();
+					select(len, len);
+					moveCaretToBottom();
+					return true;
+				}
 				if(!isCaretAtBottom()) {
 					moveCaretToBottom();
 					return processKeyBinding(ks, e, condition, pressed);
 				}
 				//提取用户输入
-				String content = lastLine.substring(LEN_HINT, lastLine.length());
+				String content = getLastInput(lastLine);
 				if(!content.equals("") && onSubmitListener != null){
 					textArea.append("\n");
+					inputs.add(content);
+					inputsPointer = inputs.size();
 					onSubmitListener.onSubmit(content);
 					textArea.append(HINT);
 				}else {
@@ -398,16 +459,59 @@ public class CommandWindow extends JFrame{
 					return super.processKeyBinding(KeyStroke.getKeyStroke(ks.getKeyChar()), e, condition, pressed);
 				}
 			}
-			return super.processKeyBinding(ks, e, condition, pressed);
+			return handleCodeHinting(ks, e) ? true : super.processKeyBinding(ks, e, condition, pressed);
+		}
+
+		/**
+		 * 处理代码提示，通过类内的CodeAssistant来查找相应代码并显示在commandWindow内
+		 * @param ks
+		 * @param e
+         * @return 如果拦截了空格或提示了代码的话返回true，否则返回false
+         */
+		public boolean handleCodeHinting(KeyStroke ks , KeyEvent e) {
+			if (assistant == null) return false;
+			if(ks.getKeyEventType() == 400 &&ks.getKeyChar() == ' ') {
+				if(isSelecting()) {
+					int pos = getTextLength();
+					textArea.select(pos, pos);
+					
+					return true;
+				}else {
+					return false;
+				}
+			}
+			if(ks.getKeyEventType() == 402 &&e.getKeyChar() > 31 && e.getKeyChar() < 127) {
+				int start = getCaretPosition();
+				String lastInput = getLastInput(null);
+				SelectableArray<WeightedString> find = assistant.find(lastInput);
+				int select = -1, min = Integer.MAX_VALUE;
+				for (int i = 0; i < find.size(); i++) {
+					WeightedString weightedString = find.get(i);
+					if (weightedString.weight == 0) {
+						int dis = weightedString.string.length() - lastInput.length();
+						if (dis < min) {
+							min = dis;
+							select = i;
+						}
+					}
+				}
+				if (select != -1) {
+					replaceInputing(find.get(select).string);
+					select(getTextLength(), start);
+					moveCaretPosition(start);
+				}
+				return true;
+			}
+			return false;
 		}
 	}
-	
+
 	/**
 	 * 用户输入的内容会通过此接口回调，将每一次用户的一行输入作为函数的参数通知外界
 	 * @author congxiaoyao
 	 *
 	 */
 	public interface OnSubmitListener{
-		public abstract void onSubmit(String content);
+		void onSubmit(String content);
 	}
 }
