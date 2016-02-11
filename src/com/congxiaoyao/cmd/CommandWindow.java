@@ -20,12 +20,16 @@ import com.congxiaoyao.cmd.CodeAssistant.WeightedString;
 /**
  * 用JTextArea写成的仿windows的CMD窗口，作为CMD框架的一部分，主要负责UI方面的内容
  * 调用无参的构造函数实例化后，使用{@code CommandWindow#setVisible()}方法显示 关闭窗口情调用{@code closeWindow}方法
- * 用户输入的每一行合法内容都会以回调接口的形式通知外界 
- * @see OnSubmitListener#onSubmit(String)
+ * 用户输入的每一行合法内容都会以回调接口的形式通知外界
+ * {@code OnSubmitListener#onSubmit(String)}
  * 支持代码提示功能，默认不开启，如需启用请构造{@code CodeAssistant}实例并传入
- * @see #setAssistant(CodeAssistant)
+ * {@code #setAssistant(CodeAssistant)}
  * 按住ctrl+上下箭头可查看之前输入过的内容
  * 其他小功能请看类内共有方法的方法注释
+ *
+ * @see OnSubmitListener#onSubmit(String)
+ * @see #setAssistant(CodeAssistant)
+ *
  * @version 1.1
  * @author congxiaoyao
  * @date 2016.1.24

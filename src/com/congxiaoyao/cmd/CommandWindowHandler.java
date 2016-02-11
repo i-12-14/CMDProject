@@ -12,7 +12,7 @@ import javax.swing.*;
  * 
  * @author congxiaoyao
  * @date 2016.2.2
- * @version 1.1
+ * @version 1.1.1
  */
 public class CommandWindowHandler {
 	
@@ -48,7 +48,7 @@ public class CommandWindowHandler {
 	
 	@CommandName
 	public void handleVersion() {
-		System.out.println("1.0");
+		System.out.println("v1.1.1");
 	}
 	
 	@CommandName
@@ -161,6 +161,27 @@ public class CommandWindowHandler {
 		window.printlnSmoothly(result);
 	}
 
+	@CommandName("ecc")
+	public void enableCodeCompletion(boolean enable) {
+		if (enable) {
+			window.setAssistant(new CodeAssistant(getAnalyzer().getCommands()));
+		}else {
+			window.setAssistant(null);
+		}
+	}
+
+	@CommandName("addcmd")
+	public void addCommand(String commandName, int paramCount, String delimiter, String description) {
+		getAnalyzer().addCommand(new Command(commandName, paramCount, delimiter, description));
+		System.out.println("ok");
+	}
+
+	@CommandName("delcmd")
+	public void deleteCommand(String commandName, int paramCount, String delimiter) {
+		getAnalyzer().removeCommand(new Command(commandName, paramCount, delimiter, ""));
+		System.out.println("ok");
+	}
+
 	public void registerCommands(Analysable analysable) {
 
 		analysable.addCommand(new Command("720p",	"设置窗口尺寸为720P"));
@@ -174,9 +195,9 @@ public class CommandWindowHandler {
 		analysable.addCommand(new Command("font",	1,	"设置字体大小"));
 		analysable.addCommand(new Command("close",	1,	"设置能否用鼠标关闭窗口"));
 		analysable.addCommand(new Command("window",	1,	"max、full、nobar"));
-		
+
 		analysable.addCommand(new Command("bound",	2,	"设置窗口宽高"));
-		
+
 		analysable.addCommand(new Command("hint",	1,		"`",	"设置hint文字"));
 	}
 }
