@@ -22,9 +22,9 @@ public class MainClass {
 
 		//动态的添加和删除命令
 		analyzer = CommandAnalyzerManager.getInstance();
-//		analyzer.addCommand(new Command("welcome"));
-//		analyzer.process("welcome");
-//		analyzer.removeCommand(new Command("welcome"));
+		analyzer.addCommand(new Command("welcome"));
+		analyzer.process("welcome");
+		analyzer.removeCommand(new Command("welcome"));
 
 //		一句话即可支持代码提示
 //		window.setAssistant(new CodeAssistant(analyzer.getCommands()));

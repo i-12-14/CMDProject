@@ -48,7 +48,7 @@ public class CommandWindowHandler {
 	
 	@CommandName
 	public void handleVersion() {
-		System.out.println("v1.1.1");
+		System.out.println("v1.1.2");
 	}
 	
 	@CommandName
