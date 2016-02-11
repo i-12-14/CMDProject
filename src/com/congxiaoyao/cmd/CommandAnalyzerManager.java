@@ -59,10 +59,13 @@ public class CommandAnalyzerManager implements Analysable{
 	 */
 	public void addHandlingObject(Object handlingObject) {
 		List<Command> commands = getCommands();
-		CommandAnalyzer analyzer = (commands == null ? 
-				new CommandAnalyzer(handlingObject) : 
-					new CommandAnalyzer(handlingObject,commands,
-							analyzers.iterator().next().commandsDirectory));
+		CommandAnalyzer analyzer = null;
+		if (commands == null) {
+			analyzer = new CommandAnalyzer(handlingObject);
+		}else {
+			analyzer = new CommandAnalyzer(handlingObject, commands,
+					analyzers.iterator().next().commandsDirectory);
+		}
 		analyzers.add(analyzer);
 	}
 

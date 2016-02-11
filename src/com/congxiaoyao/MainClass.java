@@ -2,9 +2,6 @@ package com.congxiaoyao;
 
 import com.congxiaoyao.cmd.*;
 
-import java.io.File;
-import java.lang.reflect.Method;
-
 public class MainClass {
 
 	private static Analysable analyzer;
@@ -37,19 +34,5 @@ public class MainClass {
 				+ "并且已经实现了相应功能，可以输入help进行查看\n"
 				+ "具体工作原理及使用方式见CommandAnalyzer类头注释\n"
 				+ "\4");
-	}
-	@CommandName
-	public static void handleInvoke(String className, String methodName) {
-		try {
-			String classPath = new File("bin").getAbsolutePath();
-			DynamicClassLoader classLoader =
-					new DynamicClassLoader(DynamicClassLoader.class.getClassLoader());
-			Class<?> objectClass = classLoader.loadClass(classPath, className);
-			Object object = objectClass.newInstance();
-			Method handleTest = objectClass.getMethod(methodName);
-			handleTest.invoke(object);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

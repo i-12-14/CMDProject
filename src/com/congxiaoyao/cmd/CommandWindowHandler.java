@@ -3,16 +3,17 @@ package com.congxiaoyao.cmd;
 import com.congxiaoyao.cmd.CommandWindow.OnSubmitListener;
 
 import javax.swing.*;
+import java.io.File;
 
 /**
  * 主要为了处理对CommandWindow的操作的命令，如清屏、退出、设置窗口大小提示语等
  * 正常的话这些处理函数应该耦合在CommandWindow所在的类中，这里主要是当做对cmd框架使用的一个简单demo
- * 支持动态添加操作CommandWindow的命令，如果没有在相应文件中声明命令，可调用此函数添加
+ * 同时也提供了命令的动态添加、删除、处理的命令，关于实现
  * @see #registerCommands(Analysable)
  * 
  * @author congxiaoyao
  * @date 2016.2.2
- * @version 1.1.1
+ * @version 1.2
  */
 public class CommandWindowHandler {
 	
@@ -180,6 +181,16 @@ public class CommandWindowHandler {
 	public void deleteCommand(String commandName, int paramCount, String delimiter) {
 		getAnalyzer().removeCommand(new Command(commandName, paramCount, delimiter, ""));
 		System.out.println("ok");
+	}
+
+	@CommandName("handle_with")
+	public void addHandlingMethod(String className) throws Exception {
+		String classPath = new File("bin").getAbsolutePath();
+		DynamicClassLoader classLoader =
+				new DynamicClassLoader(DynamicClassLoader.class.getClassLoader());
+		Class<?> objectClass = classLoader.loadClass(classPath, className);
+		Object handlingObject = objectClass.newInstance();
+		CommandAnalyzerManager.handleWith(handlingObject);
 	}
 
 	public void registerCommands(Analysable analysable) {

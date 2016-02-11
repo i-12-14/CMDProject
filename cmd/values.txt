@@ -34,6 +34,7 @@
 'window'	'1'		'max、full、nobar'
 'bound'		'2'		'设置窗口宽高'
 %'addcmd'	'4'		'命令名 参数个数 分隔符 描述'
+'handle_with'  '1'  '参数为完整的类名 如com.cmd.Command'
 
 %四参
 'hint'		'1'		'`'		'设置hint文字 分隔符为`'

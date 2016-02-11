@@ -17,7 +17,6 @@ import java.util.Map.Entry;
  * 通过注解来绑定处理函数与命令，假设我们的处理方法写在了类Case中
  * <hr><pre>
  * public class Case{
- * 
  * 		<code>@CommandName("help")
  * 		public void foo(){
  * 			//something to do when user input help
@@ -40,8 +39,13 @@ import java.util.Map.Entry;
  * 可变参数命令是指在参数定义的时候并不关心准确的参数个数（paramCount要标为-1），用户输几个我就处理几个，这样的话
  * 想要拦截可变参数命令，处理函数的参数可以是Command类型、多参且都是String类型（要正好与这次用户输入的参数个数匹配）、
  * String...类型。如果以Command作为参数类型，其对象中的paramCount为-1，请以parameters（String数组）的长度为准
- * 
- * 关于命令的动态申请，见{@code CommandAnalyzer#addCommand(Command)}方法
+ *
+ * 关于动态特性
+ * 支持命令的动态申请，可以通过代码甚至是命令添加一条命令 见{@code CommandAnalyzer#addCommand(Command)}
+ * 支持处理函数的动态添加，通过{@code DynamicClassLoader}实现了class文件的热加载
+ * 支持命令的动态删除，可以通过代码甚至是命令添加一条命令见{@code CommandAnalyzer#removeCommand(Command)}
+ * 动态特性使得程序运行起来之后仍然可以动态的添加、删除命令甚至可以改变命令的处理方式，6的不行
+ *
  * 关于处理函数的多类分布问题，见{@code CommandAnalyzerManager}类头注释
  * 
  * 关于自动参数类型转换
@@ -49,7 +53,7 @@ import java.util.Map.Entry;
  * 那么只要将处理函数的参数类型定义为int或Integer类型，CommandAnalyzer会自动将String类型的参数转为int/Integer型
  * 
  * 关于敏感参数拦截
- * 对于一参命令,其处理函数可以通过OnlyCare注解过滤掉其他的参数，只在用户输入她想要的参数时才会回调这个函数例如
+ * 对于一参命令,其处理函数可以通过OnlyCare注解过滤掉其他的参数，只在用户输入注解关心的参数时才会回调这个函数例如
  * 	
  * <hr><pre>
  * <code>@CommandName("screen")
@@ -454,7 +458,7 @@ public class CommandAnalyzer implements Analysable
 		StringBuilder builder = new StringBuilder();
 		for (Command command : commands) {
 			builder.append(command.commandName);
-			builder.append("\t\t");
+			builder.append(command.commandName.length() > 7 ? "\t" : "\t\t");
 			builder.append(command.description);
 			builder.append("\n");
 		}
