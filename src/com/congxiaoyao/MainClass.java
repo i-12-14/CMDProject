@@ -1,6 +1,8 @@
 package com.congxiaoyao;
 
 import com.congxiaoyao.cmd.*;
+import com.congxiaoyao.handler.CommandWindowHandler;
+import com.congxiaoyao.handler.HelpHandler;
 
 public class MainClass {
 
@@ -14,11 +16,12 @@ public class MainClass {
 		window.setOnSubmitListener((content -> analyzer.process(content)));
 
 		//绑定命令的处理函数所定义的类的实例，可以是多个
+		analyzer = CommandAnalyzerManager.getInstance();
 		CommandAnalyzerManager.handleWith(new CommandWindowHandler(window));
+		CommandAnalyzerManager.handleWith(new HelpHandler());
 		CommandAnalyzerManager.handleWith(new MainClass());
 
 		//动态的添加和删除命令
-		analyzer = CommandAnalyzerManager.getInstance();
 		analyzer.addCommand(new Command("welcome"));
 		analyzer.process("welcome");
 		analyzer.removeCommand(new Command("welcome"));

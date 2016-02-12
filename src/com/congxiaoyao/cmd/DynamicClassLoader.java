@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
 
 /**
  * class文件的热加载类，使得cmd框架动态添加和处理命令成为可能

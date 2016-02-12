@@ -301,7 +301,10 @@ public class CommandWindow extends JFrame{
 	 */
 	public void println(String string){
 		int len = string.length();
-		if(len != 0 && string.charAt(len-1) == '\4') {
+		if (len != 0 && string.charAt(0) == '\5') {
+			printlnSmoothly(string.substring(1, len));
+		}
+		else if(len != 0 && string.charAt(len-1) == '\4') {
 			textArea.append(string.substring(0, len-1));
 			textArea.append(LFHINT);
 		}else {
@@ -422,7 +425,12 @@ public class CommandWindow extends JFrame{
 					inputs.add(content);
 					inputsPointer = inputs.size();
 					onSubmitListener.onSubmit(content);
-					textArea.append(HINT);
+					lastLine = getLastLine();
+					if (lastLine.isEmpty()) {
+						textArea.append(HINT);
+					}else if(!lastLine.equals(HINT)){
+						textArea.append(LFHINT);
+					}
 				}else {
 					textArea.append(LFHINT);
 				}

@@ -11,11 +11,11 @@ import java.util.Map.Entry;
  * 从而不必在命令定义、分析、查找、执行等细节上花费太多时间
  * 1、在cmd/values.txt内定义一个具体的命令，定义的格式见文件内注释
  * 2、在任意类中定义命令的处理方法，并通过注解与命令绑定
- * 3、构造出CommandAnalyzer的实例，调用process方法即可处理一条用户输入的内容，具体使用见方法注释
- * 下面是小例子
- * 假设我们有命令定义如下		'help' '查看帮助信息'
- * 通过注解来绑定处理函数与命令，假设我们的处理方法写在了类Case中
- * <hr><pre>
+ * 3、构造出CommandAnalyzer的实例，调用{@code process(String)}方法即可处理一条用户输入的内容，具体使用见方法注释
+ * 下面是小例子：
+ * 在values.txt中定义命令定义如下
+ * <hr><pre>  'help' '查看帮助信息'
+ * 通过注解<code>@CommandName</code>绑定处理函数与命令
  * public class Case{
  * 		<code>@CommandName("help")
  * 		public void foo(){
@@ -27,7 +27,7 @@ import java.util.Map.Entry;
  * 		}
  * }
  * </pre><hr>
- * 关于重载命令
+ * <p>关于重载命令</p>
  * 命令支持多参重载，回调处理函数的时候，会根据处理函数参数的个数及类型选择合适的处理函数进行回调
  * 当命令被识别出来后，会先去寻找参数个数与命令所携带的参数个数相等的处理函数回调之
  * 如果找不到，会再次寻找参数为Command或String...类型的处理函数，因为这两种类型可以拦截任意参数个数
@@ -35,24 +35,24 @@ import java.util.Map.Entry;
  * 如果对同一个非重载的命令定义了多个处理函数，或对于一个重载命令定义了多个处理相同参数个数的处理函数
  * 会导致其多余的处理函数失效，请尽量避免重复
  * 
- * 关于可变参数命令
+ * <p>关于可变参数命令</p>
  * 可变参数命令是指在参数定义的时候并不关心准确的参数个数（paramCount要标为-1），用户输几个我就处理几个，这样的话
- * 想要拦截可变参数命令，处理函数的参数可以是Command类型、多参且都是String类型（要正好与这次用户输入的参数个数匹配）、
- * String...类型。如果以Command作为参数类型，其对象中的paramCount为-1，请以parameters（String数组）的长度为准
+ * 想要拦截可变参数命令，处理函数的参数可以是Command类型、多参且都是String类型（要正好与这次用户输入的参数个数匹配）
+ * 或String...类型。如果以Command作为参数类型，其对象中的paramCount为-1，请以parameters（String数组）的长度为准
  *
- * 关于动态特性
+ * <p>关于动态特性</p>
  * 支持命令的动态申请，可以通过代码甚至是命令添加一条命令 见{@code CommandAnalyzer#addCommand(Command)}
+ * 支持命令的动态删除，可以通过代码甚至是命令删除一条命令见{@code CommandAnalyzer#removeCommand(Command)}
  * 支持处理函数的动态添加，通过{@code DynamicClassLoader}实现了class文件的热加载
- * 支持命令的动态删除，可以通过代码甚至是命令添加一条命令见{@code CommandAnalyzer#removeCommand(Command)}
- * 动态特性使得程序运行起来之后仍然可以动态的添加、删除命令甚至可以改变命令的处理方式，6的不行
+ * 动态特性使得程序运行起来之后仍然可以动态的添加、删除命令甚至可以改变命令的处理方式，溜的不行
  *
- * 关于处理函数的多类分布问题，见{@code CommandAnalyzerManager}类头注释
+ * <p>关于处理函数的多类分布问题，见{@code CommandAnalyzerManager}类头注释</p>
  * 
- * 关于自动参数类型转换
+ * <p>关于自动参数类型转换</p>
  * 如果命令中的参数是基本数据类型的一种 如设置窗口尺寸时，命令的参数实际是int型的
  * 那么只要将处理函数的参数类型定义为int或Integer类型，CommandAnalyzer会自动将String类型的参数转为int/Integer型
  * 
- * 关于敏感参数拦截
+ * <p>关于敏感参数拦截</p>
  * 对于一参命令,其处理函数可以通过OnlyCare注解过滤掉其他的参数，只在用户输入注解关心的参数时才会回调这个函数例如
  * 	
  * <hr><pre>
@@ -71,6 +71,7 @@ import java.util.Map.Entry;
 
 public class CommandAnalyzer implements Analysable
 {
+	private int id = -1;
 	private Object invoker;
 	
 	private List<Command> commands = new ArrayList<>();
@@ -485,6 +486,7 @@ public class CommandAnalyzer implements Analysable
 			//如果最终找到了
 			if(method != null) {
 				builder.append("handlingMethod-->").append(method.toGenericString()).append('\n');
+				builder.append("analyzer_id-->").append(getId()).append('\n');
 			}
 			//有可能这个command对应了好多个handlingMethod，一点一点找吧
 			else {
@@ -494,13 +496,28 @@ public class CommandAnalyzer implements Analysable
 					if(isBeginWith(commandName, key, null)) {
 						builder.append("handlingMethod-->")
 						.append(entry.getValue().toGenericString()).append('\n');
+						builder.append("analyzer_id-->").append(getId()).append('\n');
 					}
 				}
 			}
 		}
 		return builder.append('\n').toString();
 	}
-	
+
+	@Override
+	public int getHandlingMethodSize() {
+		return methodsMap.size();
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public int getId() {
+		return id;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof CommandAnalyzer) {

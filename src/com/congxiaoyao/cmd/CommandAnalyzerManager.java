@@ -1,12 +1,7 @@
 package com.congxiaoyao.cmd;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -22,6 +17,8 @@ public class CommandAnalyzerManager implements Analysable{
 	
 	private static CommandAnalyzerManager commandManager = null;
 	private Set<CommandAnalyzer> analyzers = null;
+	private CommandAnalyzer lastAnalyzer = null;
+	private int id = -1;
 
 	/**
 	 * 单例模式，获取CommandManager的实例
@@ -66,7 +63,29 @@ public class CommandAnalyzerManager implements Analysable{
 			analyzer = new CommandAnalyzer(handlingObject, commands,
 					analyzers.iterator().next().commandsDirectory);
 		}
+		analyzer.setId(new Random().nextInt(100000));
+		lastAnalyzer = analyzer;
 		analyzers.add(analyzer);
+	}
+
+	/**
+	 * 每一次调用addHandlingObject都会新建一个analyzer并放入一个set中，这里就是根据他们的id来移除之
+	 * @param id
+     */
+	public boolean removeHandlingObject(int id) {
+		Iterator<CommandAnalyzer> iterator = analyzers.iterator();
+		while (iterator.hasNext()) {
+			CommandAnalyzer analyzer = iterator.next();
+			if (analyzer.getId() == id) {
+				iterator.remove();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void removeLastHandlingObeject() {
+		analyzers.remove(lastAnalyzer);
 	}
 
 	/**
@@ -151,6 +170,7 @@ public class CommandAnalyzerManager implements Analysable{
 				if(method == null) method = analyzer.methodsMap.get(command.commandName + "$");
 				if(method != null) {
 					builder.append("handlingMethod-->").append(method.toGenericString()).append('\n');
+					builder.append("analyzer_id-->").append(analyzer.getId()).append('\n');
 					break;
 				}
 				//有可能这个command对应了好多个handlingMethod，一点一点找吧
@@ -161,6 +181,7 @@ public class CommandAnalyzerManager implements Analysable{
 						if(CommandAnalyzer.isBeginWith(commandName, key, null)) {
 							builder.append("handlingMethod-->")
 							.append(entry.getValue().toGenericString()).append('\n');
+							builder.append("analyzer_id-->").append(analyzer.getId()).append('\n');
 						}
 					}
 				}
@@ -181,7 +202,25 @@ public class CommandAnalyzerManager implements Analysable{
 		}
 		return builder.toString();
 	}
-	
+
+	@Override
+	public int getHandlingMethodSize() {
+		int size = 0;
+		for (CommandAnalyzer analyzer : analyzers) {
+			size += analyzer.getHandlingMethodSize();
+		}
+		return size;
+	}
+
+	@Override
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public Set<CommandAnalyzer> getAnalyzers() {
 		return analyzers;
 	}

@@ -10,7 +10,7 @@ import java.util.List;
  * 之后调用{@code CodeAssistant#find(String)}方法传入用户的当前输入即可得到代码提示的结果
  * 结果是以{@code SelectableArray<WeightedString>}的形式返回，SelectableArray支持foreach遍历获取内容
  * WeightedString中所有字段都是public访问权限的，其string字段代表了所谓的CommandName
- * 了解详情请查看类头注释
+ * 了解详情请查看WeightedString的类头注释
  * Created by congxiaoyao on 2015/12/20.
  * @version 1.1
  */

@@ -23,34 +23,44 @@ public interface Analysable {
 	 * @param content 用户输入
 	 * @return 处理成功true 否则false
 	 */
-	public abstract boolean process(String content);
+	boolean process(String content);
 	
 	/**
 	 * @return 命令的集合
 	 */
-	public abstract List<Command> getCommands();
+	List<Command> getCommands();
 
 	/**
 	 * 向命令集合中添加一条命令
 	 * @param command
 	 */
-	public abstract void addCommand(Command command);
+	void addCommand(Command command);
 	
 	/**
 	 * 从命令集合中移除一条命令
 	 * @param command
 	 */
-	public abstract void removeCommand(Command command);
+	void removeCommand(Command command);
 
 	/**
 	 * @return 所有命令的描述信息整理成String的形式返回
 	 */
-	public abstract String getCommandsDescription();
+	String getCommandsDescription();
 
 	/**
 	 * 通过命令名获取这条命令的信息以String的形式返回
 	 * @param commandName 所有的命令名为commandName的命令都会被找到
 	 * @return 每一行分别是 commandName、paramCount、delimiter、handlingMethod
 	 */
-	public abstract String getCommandInfo(String commandName);
+	String getCommandInfo(String commandName);
+
+	/**
+	 * @return 处理函数的个数
+     */
+	int getHandlingMethodSize();
+
+	/**
+	 * @return id
+     */
+	int getId();
 }
