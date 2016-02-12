@@ -160,10 +160,11 @@ public class CommandAnalyzerHandler extends CommandHandler{
 
     @CommandName("ca_infos")
     public void getCommandAnalyzerInfos() {
-        System.out.println("ids\t\tnames");
+        System.out.println("ids\t\tsize\t\tnames");
         for (CommandAnalyzer analyzer : set) {
             try {
                 System.out.print(analyzer.getId()+"\t\t");
+                System.out.print(analyzer.getHandlingMethodSize()+"\t\t");
                 System.out.println(getInvoker(analyzer).getClass().getSimpleName());
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();

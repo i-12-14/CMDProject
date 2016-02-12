@@ -1,6 +1,7 @@
 package com.congxiaoyao;
 
 import com.congxiaoyao.cmd.*;
+import com.congxiaoyao.handler.CommandAnalyzerHandler;
 import com.congxiaoyao.handler.CommandWindowHandler;
 import com.congxiaoyao.handler.HelpHandler;
 
@@ -20,6 +21,7 @@ public class MainClass {
 		CommandAnalyzerManager.handleWith(new CommandWindowHandler(window));
 		CommandAnalyzerManager.handleWith(new HelpHandler());
 		CommandAnalyzerManager.handleWith(new MainClass());
+		CommandAnalyzerManager.handleWith(new CommandAnalyzerHandler().registerCommands());
 
 		//动态的添加和删除命令
 		analyzer.addCommand(new Command("welcome"));
