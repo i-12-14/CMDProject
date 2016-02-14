@@ -105,7 +105,7 @@ public class CommandWindow extends JFrame{
 			public void println(Object x) {
 				if(x == null) 
 					println("null");
-				println(x.toString());
+				else println(x.toString());
 			}
 			@Override
 			public void print(String s) {
@@ -471,7 +471,7 @@ public class CommandWindow extends JFrame{
 					return super.processKeyBinding(KeyStroke.getKeyStroke(ks.getKeyChar()), e, condition, pressed);
 				}
 			}
-			return handleCodeHinting(ks, e) ? true : super.processKeyBinding(ks, e, condition, pressed);
+			return handleCodeCompletion(ks, e) ? true : super.processKeyBinding(ks, e, condition, pressed);
 		}
 
 		/**
@@ -480,7 +480,7 @@ public class CommandWindow extends JFrame{
 		 * @param e
          * @return 如果拦截了空格或提示了代码的话返回true，否则返回false
          */
-		public boolean handleCodeHinting(KeyStroke ks , KeyEvent e) {
+		public boolean handleCodeCompletion(KeyStroke ks , KeyEvent e) {
 			if (assistant == null) return false;
 			if(ks.getKeyEventType() == 400 &&ks.getKeyChar() == ' ') {
 				if(isSelecting()) {

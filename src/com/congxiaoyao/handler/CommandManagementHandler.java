@@ -5,12 +5,10 @@ import com.congxiaoyao.cmd.*;
 import java.io.File;
 
 /**
- * 基于Analysable的getCommandsDescription、getCommandInfo方法提供帮助命令
+ * 动态的命令管理类
  * 基于CommandAnalyzer的动态性特性实现了一些处理函数使得使用者可以在运行时对命令及其处理函数做增删操作
  * 
  * 支持的命令有
- * 'help'			'帮助'
- * 'help'	        '1'		'查看每个命令的详细信息'
  * 'remana'         '1'     '通过id移除一个CommandAnalyzer'
  * 'handle_with'    '1'     '参数为完整的类名 如com.cmd.Command'
  * 'addcmd'   '4'   '`'     '添加命令`命令名`参数个数`分隔符`描述'
@@ -21,7 +19,7 @@ import java.io.File;
  * Created by congxiaoyao on 2016/2/12.
  * @version 1.0
  */
-public class CommandManagementHandler extends CommandHandler{
+public class CommandManagementHandler extends BaseHandler {
 
     /**
      * 可以在运行时添加一条命令，使得Analysable可以维护这条command
@@ -80,34 +78,12 @@ public class CommandManagementHandler extends CommandHandler{
     }
 
     /**
-     * 输出帮助信息
-     */
-    @CommandName
-    public void handleHelp() {
-        System.out.println("\5" + getAnalysable().getCommandsDescription());
-    }
-
-    /**
-     * 输出某个特定指令的详细帮助信息 传入-all为输出全部命令的详细帮助信息
-     * 强调下框架特性 这个处理函数跟上面的处理函分别处理了重载命令（一参help跟无参help）
-     * 巧的是这两个处理函数也是重载的 当然了处理函数不一定也同时重载
-     * 只要CommandName注解标注好，即可根据参数个数定位对应处理函数
-     * @param commandName
-     */
-    @CommandName
-    public void handleHelp(String commandName) {
-        System.out.println("\5" + getAnalysable().getCommandInfo(commandName));
-    }
-
-    /**
      * 如果不通过文件配置命令的话，也可以调用这个函数动态的添加这些命令
      * 这个函数添加的所有命令的处理方法已经被CommandHandler中的处理函数实现了
      */
     @Override
-    public CommandHandler registerCommands() {
+    public BaseHandler registerCommands() {
         Analysable analysable = getAnalysable();
-        analysable.addCommand(new Command("help",	"帮助"));
-        analysable.addCommand(new Command("help",	     1,	"查看每个命令的详细信息"));
         analysable.addCommand(new Command("remana",      1, "通过id移除一个CommandAnalyzer"));
         analysable.addCommand(new Command("handle_with", 1, "参数为完整的类名 如com.cmd.Command"));
         analysable.addCommand(new Command("addcmd", 4, "`", "添加命令`命令名`参数个数`分隔符`描述"));

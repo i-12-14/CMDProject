@@ -4,10 +4,7 @@ import com.congxiaoyao.cmd.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 提供了CommandAnalyzerManager中维护的CommandAnalyzer的信息的读取操作
@@ -24,9 +21,9 @@ import java.util.Set;
  * 'ca_infos'               'ids+names'
  *
  * Created by congxiaoyao on 2016/2/12.
- * @version 1.0
+ * @version 1.4
  */
-public class CommandAnalyzerHandler extends CommandHandler{
+public class CommandAnalyzerHandler extends BaseHandler {
 
     private Set<CommandAnalyzer> set;
     private CommandAnalyzer nowAnalyzer;
@@ -34,38 +31,151 @@ public class CommandAnalyzerHandler extends CommandHandler{
     public CommandAnalyzerHandler() {
         set = CommandAnalyzerManager.getInstance().getAnalyzers();
     }
-    public CommandAnalyzerHandler(CommandAnalyzer analyzer) {
-        set = new HashSet<>(1);
-        set.add(analyzer);
+
+    /**
+     * @return 获取CommandAnalyzer的set中的所有CommandAnalyzer的id
+     */
+    public static int[] getCommandAnalyzerIds() {
+        Set<CommandAnalyzer> set = CommandAnalyzerManager.getInstance().getAnalyzers();
+        int[] ids = new int[set.size()];
+        Iterator<CommandAnalyzer> iterator = null;
+        for (int i = 0; i < ids.length; i++) {
+            ids[i] = iterator.next().getId();
+        }
+        return ids;
     }
 
-    @OnlyCare("methodsMap")
-    @CommandName("ca_show")
-    public void showMethodsMap() {
-        if (!checkNowAnalyzer()) return;
+    /**
+     * @return 获取CommandAnalyzer的set中的所有CommandAnalyzer的name
+     */
+    public static String[] getCommandAnalyzerNames() {
+        Set<CommandAnalyzer> set = CommandAnalyzerManager.getInstance().getAnalyzers();
+        int index = 0;
+        String[] names = new String[set.size()];
+        for (CommandAnalyzer analyzer : set) {
+            names[index++] = getInvoker(analyzer).getClass().getName();
+        }
+        return names;
+    }
+
+    /**
+     * @param analyzer
+     * @return CommandAnalyzer中的methodsMap对象
+     */
+    public static Map<String, Method> getMethodsMap(CommandAnalyzer analyzer) {
+        Map<String, Method> methodsMap = null;
         try {
             Field field = CommandAnalyzer.class.getDeclaredField("methodsMap");
             field.setAccessible(true);
-            Map<String, Method> methodsMap = (Map<String, Method>) field.get(nowAnalyzer);
-            methodsMap.forEach((String s, Method method) ->{
-                String[] methodInfo= method.toString().split(" ");
-                String methodName = methodInfo[methodInfo.length - 1];
-                int end = methodName.indexOf('(');
-                methodName = methodName.substring(0, end);
-                String[] split = methodName.split("\\.");
-                String methodNameNew = split[split.length - 1];
-                methodNameNew = method.toString().replace(methodName,methodNameNew);
-                System.out.println("<" + s + " , " + methodNameNew + ">");
-            });
+            methodsMap = (Map<String, Method>) field.get(analyzer);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+        return methodsMap;
     }
-    @OnlyCare("directory")
+
+    /**
+     * @param analyzer
+     * @return CommandAnalyzer中的commandsDirectory对象
+     */
+    public static Map<Character, int[]> getCommandsDirectory(CommandAnalyzer analyzer) {
+        Map<Character, int[]> directory = null;
+        try {
+            Field field = CommandAnalyzer.class.getDeclaredField("commandsDirectory");
+            field.setAccessible(true);
+            directory = (Map<Character, int[]>) field.get(analyzer);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return directory;
+    }
+
+    /**
+     * @param analyzer
+     * @return 通过反射获取CommandAnalyzer内的invoker对象
+     */
+    public static Object getInvoker(CommandAnalyzer analyzer){
+        Object invoker = null;
+        try {
+            Field field = CommandAnalyzer.class.getDeclaredField("invoker");
+            field.setAccessible(true);
+            invoker = field.get(analyzer);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return invoker;
+    }
+
+    /**
+     * @param analyzer
+     * @return 参数analyzer所能处理的命令的集合
+     */
+    public static List<Command> getCommandsHandleBy(CommandAnalyzer analyzer) {
+        List<Command> result = new ArrayList<>();
+        List<Command> commands = analyzer.getCommands();
+        for (Command command : commands) {
+            String info = analyzer.getCommandInfo(command.commandName);
+            if(info.contains("handlingMethod")) {
+                result.add(command);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @param className 类名 全名简写皆可
+     * @return 通过invoker的类名来寻找对应的CommandAnalyzer
+     */
+    public static CommandAnalyzer getCommandAnalyzerByName(String className) {
+        Set<CommandAnalyzer> set = CommandAnalyzerManager.getInstance().getAnalyzers();
+        for (CommandAnalyzer analyzer : set) {
+            Object invoker = getInvoker(analyzer);
+            if (invoker.getClass().getName().contains(className)) {
+                return analyzer;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param id CommandAnalyzer的id
+     * @return 通过CommandAnalyzer的id来寻找对应的CommandAnalyzer
+     */
+    public static CommandAnalyzer getCommandAnalyzerById(int id) {
+        Set<CommandAnalyzer> set = CommandAnalyzerManager.getInstance().getAnalyzers();
+        for (CommandAnalyzer analyzer : set) {
+            if (analyzer.getId() == id) {
+                return analyzer;
+            }
+        }
+        return null;
+    }
+
     @CommandName("ca_show")
-    public void showCommandsDirectory() {
+    public void showMethodsMap(@OnlyCare("methodsMap")String arg) {
+        if (!checkNowAnalyzer()) return;
+        Map<String, Method> methodsMap = getMethodsMap(nowAnalyzer);
+        methodsMap.forEach((String s, Method method) ->{
+            String[] methodInfo= method.toString().split(" ");
+            String methodName = methodInfo[methodInfo.length - 1];
+            int end = methodName.indexOf('(');
+            methodName = methodName.substring(0, end);
+            String[] split = methodName.split("\\.");
+            String methodNameNew = split[split.length - 1];
+            methodNameNew = method.toString().replace(methodName,methodNameNew);
+            System.out.println("<" + s + " , " + methodNameNew + ">");
+        });
+    }
+
+
+    @CommandName("ca_show")
+    public void showCommandsDirectory(@OnlyCare("directory")String arg) {
         if (!checkNowAnalyzer()) return;
         try {
             Field field = CommandAnalyzer.class.getDeclaredField("commandsDirectory");
@@ -81,22 +191,16 @@ public class CommandAnalyzerHandler extends CommandHandler{
         }
     }
 
-    @OnlyCare("invoker")
+
     @CommandName("ca_show")
-    public void showInvoker() {
+    public void showInvoker(@OnlyCare("invoker")String invoker) {
         if (!checkNowAnalyzer()) return;
-        try {
-            System.out.println(getInvoker(nowAnalyzer).toString());
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        System.out.println(getInvoker(nowAnalyzer).toString());
     }
 
-    @OnlyCare("commands")
-    @CommandName("ca_show")
-    public void showCommands() {
+
+    @CommandName("ca")
+    public void showCommands(@OnlyCare("commands")String arg) {
         if (!checkNowAnalyzer()) return;
         List<Command> commands = nowAnalyzer.getCommands();
         for (Command command : commands) {
@@ -122,55 +226,39 @@ public class CommandAnalyzerHandler extends CommandHandler{
     @CommandName("ca_selc_name")
     public void selectCommandAnalyzerByName(String className) {
         for (CommandAnalyzer analyzer : set) {
-            try {
-                Object invoker = getInvoker(analyzer);
-                if (invoker.getClass().getName().contains(className)) {
-                    nowAnalyzer = analyzer;
-                    System.out.println("select " + invoker.getClass().getName()+" successed!");
-                    return;
-                }
-            } catch (NoSuchFieldException e) {
-                System.out.println("error NoSuchFieldException");
-            } catch (IllegalAccessException e) {
-                System.out.println("error IllegalAccessException");
+            Object invoker = getInvoker(analyzer);
+            if (invoker.getClass().getName().contains(className)) {
+                nowAnalyzer = analyzer;
+                System.out.println("select " + invoker.getClass().getName()+" successed!");
+                return;
             }
         }
         System.out.println("failed");
     }
 
     @CommandName("ca_ids")
-    public void getCommandAnalyzerIds() {
-        for (CommandAnalyzer analyzer : set) {
-            System.out.println(analyzer.getId()+"");
+    public void showCommandAnalyzerIds() {
+        int[] ids = getCommandAnalyzerIds();
+        for (int id : ids) {
+            System.out.println(id + "");
         }
     }
 
     @CommandName("ca_names")
-    public void getCommandAnalyzerNames() {
-        for (CommandAnalyzer analyzer : set) {
-            try {
-                System.out.println(getInvoker(analyzer).getClass().getName());
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+    public void showCommandAnalyzerNames() {
+        String[] names = getCommandAnalyzerNames();
+        for (String name : names) {
+            System.out.println(name);
         }
     }
 
     @CommandName("ca_infos")
-    public void getCommandAnalyzerInfos() {
+    public void showCommandAnalyzerInfos() {
         System.out.println("ids\t\tsize\t\tnames");
         for (CommandAnalyzer analyzer : set) {
-            try {
-                System.out.print(analyzer.getId()+"\t\t");
-                System.out.print(analyzer.getHandlingMethodSize()+"\t\t");
-                System.out.println(getInvoker(analyzer).getClass().getSimpleName());
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            System.out.print(analyzer.getId()+"\t\t");
+            System.out.print(analyzer.getHandlingMethodSize()+"\t\t");
+            System.out.println(getInvoker(analyzer).getClass().getSimpleName());
         }
     }
 
@@ -202,31 +290,18 @@ public class CommandAnalyzerHandler extends CommandHandler{
     }
 
     /**
-     * 通过反射获取CommandAnalyzer内的invoker对象
-     * @param analyzer
-     * @return
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
-     */
-    private static Object getInvoker(CommandAnalyzer analyzer) throws NoSuchFieldException, IllegalAccessException {
-        Field field = CommandAnalyzer.class.getDeclaredField("invoker");
-        field.setAccessible(true);
-        return field.get(analyzer);
-    }
-
-    /**
      * 如果不通过文件配置命令的话，也可以调用这个函数动态的添加这些命令
      * 这个函数添加的所有命令的处理方法已经被CommandAnalyzerHandler中的处理函数实现了
      */
     @Override
-    public CommandHandler registerCommands() {
+    public BaseHandler registerCommands() {
         Analysable analysable = getAnalysable();
         analysable.addCommand(new Command("ca_selc_id",
                 1, "通过id选出一个CommandAnalyzer从而得以执行ca_show"));
         analysable.addCommand(new Command("ca_selc_name",
                 1, "通过类名(可简写)选出一个CommandAnalyzer从而得以执行ca_show"));
         //输出选出的CommandAnalyzer的methodsMap/invoker/directory/commands的信息
-        analysable.addCommand(new Command("ca_show", 1, "参数可选 methodsMap、invoker、directory、commands"));
+        analysable.addCommand(new Command("ca", 1, "参数可选 methodsMap、invoker、directory、commands"));
         analysable.addCommand(new Command("ca_reload" , "重新加载选中的CommandAnalyzer"));
         analysable.addCommand(new Command("ca_ids" , "所有的CommandAnalyzer的id"));
         analysable.addCommand(new Command("ca_names" , "所有的CommandAnalyzer的invoker的ClassName"));

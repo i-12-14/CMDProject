@@ -6,7 +6,7 @@ import java.util.Arrays;
  * 请在cmd文件夹下配置values.cmd文件，配置好的所有的命令以这个对象的形式来进行管理
  * @author congxiaoyao
  * @date 2016.1.19
- * @version 1.0
+ * @version 1.4
  */
 
 public class Command
@@ -52,6 +52,18 @@ public class Command
 				", description='" + description + '\'' +
 				", parameters=" + Arrays.toString(parameters) +
 				'}';
+	}
+
+	/**
+	 * 生成可以用来在文件中定义这个命令的字符串
+	 */
+	public String toDefinitionString() {
+		StringBuilder builder = new StringBuilder("'");
+		builder.append(commandName).append("'\t'");
+		builder.append(paramCount).append("'\t'");
+		builder.append(delimiter).append("'\t'");
+		builder.append(description).append("'");
+		return builder.toString();
 	}
 	
 	@Override

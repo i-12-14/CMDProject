@@ -2,6 +2,7 @@ package com.congxiaoyao.cmd;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -64,7 +65,7 @@ import java.util.Map.Entry;
  * }
  * </pre><hr>
  * 
- * @version 1.1
+ * @version 1.4
  * @date 2016.1.19
  * @author congxiaoyao
  */
@@ -115,41 +116,17 @@ public class CommandAnalyzer implements Analysable
 	 * 从cmd/values.txt文件中读取配置的脚本信息并创建相应的command对象加入命令集合并建立起目录方便查询
 	 */
 	private void initCommandList() {
-		List<String> params = new ArrayList<String>(5);
+		List<String> params = new ArrayList<>(5);
 		new TextReader("cmd/values.txt") {
 			@Override
 			public void onReadLine(String line) {
 				//去注释及空行
 				if(line.length() == 0 || line.charAt(0) == '%') return;
-				
-				//将单引号引起来的内容一个一个的加入params中，对于每一行读出来的内容，第一步就是清掉上一次遗留在params中的内容
-				params.clear();
-				int start = line.indexOf('\'');
-				while(start != -1) {
-					String param = line.substring(start + 1 , start = line.indexOf('\'',start + 1));
-					start = line.indexOf('\'',start + 1);
-					params.add(param);
-				}
-				//循环读取结束，开始根据参数个数创建对应的Command对象
-				int size = params.size();
-				Command command = null;
-				switch (size) {
-				case 1: command = new Command(params.get(0)); break;
-				case 2: command = new Command(params.get(0),params.get(1)); break;
-				case 3: command = new Command(params.get(0),
-						Integer.parseInt(params.get(1)),params.get(2)); break;
-				case 4: String delimiter = characterEscape(params.get(2));
-				command = new Command(params.get(0),
-						Integer.parseInt(params.get(1)),
-						delimiter,params.get(3));
-				break;
-				default: return;
-				}
+				Command command = CmdUtils.getCommand(line);
 				insertCommand(command);
 			}
-			
 			public void onError(Exception e) {
-				
+				e.printStackTrace();
 			};
 		}.read();
 		//更新目录以方便查找
@@ -173,26 +150,21 @@ public class CommandAnalyzer implements Analysable
 		for (Method method : methods) {
 			//只处理public方法
 			int modifiers = method.getModifiers();
-			if (modifiers != 1 && modifiers != 9) continue;
+			if (modifiers != 1 && modifiers != 9 && modifiers != 25) continue;
 			//过滤掉没有注解的方法
 			if(!method.isAnnotationPresent(CommandName.class)) continue;
 			//获取上面的注解
 			CommandName commandName = method.getAnnotation(CommandName.class);
 			String value = commandName.value();
 			//如果注解中没有参数，尝试通过函数名解析命令头
-			if(value.length() == 0 && isBeginWith("handle", method.getName(), null)) {
+			if(value.length() == 0 && CmdUtils.isBeginWith("handle", method.getName(), null)) {
 				value = method.getName().replaceFirst("handle", "").toLowerCase();
 			}
 			String key = null;
 			//由于重载命令的存在，不同的函数可能会处理不同的重载命令
 			int paramCount = method.getParameterCount();
-			//带OnlyCare注解的需要按特殊规则生成key
-			if(method.isAnnotationPresent(OnlyCare.class)) {
-				if(paramCount > 1) continue;
-				key = value + method.getAnnotation(OnlyCare.class).value();
-			}
-			//如果处理函数中只有一个参数且参数为Command类型，在构造map时以命令头加$作为map的key
-			else if(paramCount == 1) {
+			//如果处理函数中只有一个参数且参数为Command或String[]类型，在构造map时以命令头加$作为map的key
+			if(paramCount == 1) {
 				Class<?> type = method.getParameterTypes()[0];
 				if(type == Command.class || type == String[].class)
 					key = value + "$";
@@ -217,7 +189,7 @@ public class CommandAnalyzer implements Analysable
 		for(int i = info[0],len = info[1]+i;i<len;i++) {
 			Command command = commands.get(i);
 			//先看是不是给定字符串是不是当前这个命令类型
-			if (!isBeginWith(command.commandName, content, command.delimiter)) continue;
+			if (!CmdUtils.isBeginWith(command.commandName, content, command.delimiter)) continue;
 			//然后在去掉命令开头去分析参数
 			String contentNew = content.replaceFirst(command.commandName, "");
 			//初始化参数个数
@@ -245,18 +217,23 @@ public class CommandAnalyzer implements Analysable
 	 */
 	public boolean handleCommand(Command command) {
 		Method method = null;
-		//对于一参的命令，尝试敏感参数拦截
+		//对于一参命令的处理函数，可以定义为无参函数加OnlyCare注解的形式，对于一参命令，先尝试寻找无参处理函数
 		if(command.paramCount == 1) {
-			method = methodsMap.get(command.commandName+command.parameters[0]);
+			method = methodsMap.get(command.commandName+"0");
+			if (method != null) {
+				if (!method.isAnnotationPresent(OnlyCare.class)) {
+					method = null;
+				}
+			}
 		}
 		//没有的话找有没有固定参数的处理这条命令的方法
 		if(method == null) {
 			method = methodsMap.get(command.commandName+
-					(command.paramCount == -1 ? 
+					(command.paramCount == -1 ?
 							(command.parameters == null ? 0 : command.parameters.length)
-									: command.paramCount));
+							: command.paramCount));
 		}
-		//再没有的话，再找参数为Command的处理这条命令的方法
+		//再没有的话，再找参数为Command或String...的处理这条命令的方法
 		if(method == null) {
 			method = methodsMap.get(command.commandName + "$");
 			if(method == null) return false;
@@ -273,15 +250,27 @@ public class CommandAnalyzer implements Analysable
 						command.parameters = new String[0];
 					method.invoke(invoker, (Object)command.parameters);
 				}
-				else method.invoke(invoker, toType(command.parameters[0], type));
+				else {
+					if (!checkIfOnlyCareCanPass(method, command)) return false;
+					method.invoke(invoker, toType(command.parameters[0], type));
+				}
 			}
 			//无参
 			else if (paramCount == 0) {
-				method.invoke(invoker);
+				//对于无参函数一参命令的特殊情况，尝试敏感参数拦截
+				if (method.isAnnotationPresent(OnlyCare.class)) {
+					OnlyCare onlyCare = method.getAnnotation(OnlyCare.class);
+					if (command.parameters.length == 1 &&
+							onlyCare.value().equals(command.parameters[0])) {
+						method.invoke(invoker);
+					}
+				}
+				else method.invoke(invoker);
 			}
-			//多参（包含一参）
+			//多参（包含一参？）
 			else if(paramCount == command.parameters.length){
 				//做String到各种基本参数类型的转换，按照处理函数参数列表的顺序一一转换
+				if (!checkIfOnlyCareCanPass(method, command)) return false;
 				Class<?>[] types = method.getParameterTypes();
 				Object[] objects = new Object[types.length];
 				for(int i=0,len = objects.length;i<len;i++) {
@@ -292,6 +281,31 @@ public class CommandAnalyzer implements Analysable
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
 			e1.printStackTrace();
 			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * 判断这个method是否带有OnlyCare注解，如果带有则判断是否符合OnlyCare的要求
+	 * @param command
+	 * @param method
+	 * @return 符合要求（通过了可以被反射调用）返回true
+	 */
+	private static boolean checkIfOnlyCareCanPass(Method method, Command command) {
+		Parameter[] parameters = method.getParameters();
+		for (int i = 0; i < parameters.length; i++) {
+			Parameter parameter = parameters[i];
+			if (parameter.isAnnotationPresent(OnlyCare.class)) {
+				OnlyCare onlyCare = parameter.getAnnotation(OnlyCare.class);
+				String careWhat = onlyCare.value();
+				if (careWhat.equals("")) {
+					careWhat = parameter.getName();
+					System.out.println(careWhat);
+				}
+				if (!careWhat.equals(command.parameters[i])) {
+					return false;
+				}
+			}
 		}
 		return true;
 	}
@@ -376,41 +390,6 @@ public class CommandAnalyzer implements Analysable
 	}
 
 	/**
-	 * 判断命令是否以给定的单词开始
-	 * @param beginWord 给定的开始单词
-	 * @param command 命令语句
-	 * @param delimiter 分隔符，如果不为null则判断command中从0到分隔符之前的内容是不是beginWord，否则直接判断
-     * @return 以给定的单词开始返回true
-	 */
-	static boolean isBeginWith(String beginWord, String command, String delimiter) {
-		if (beginWord.length() > command.length()) {
-			return false;
-		}
-		if (command.equals(beginWord)) {
-			return true;
-		}
-		return delimiter == null ? command.substring(0, beginWord.length()).equals(beginWord)
-				: command.split(delimiter)[0].equals(beginWord);
-	}
-	
-	//需要转义的字符
-	private static String[] ec = {".","$","^","(",")","[","|","{","?","+","*",};
-	/**
-	 * 分析这个String是否为ec数组中所包含的待转义的字符，如果是就给他转义喽
-	 * @param ch 待检查String
-	 * @return 转义后的ch
-	 */
-	private static String characterEscape(String ch) {
-		for (String string : ec) {
-			if(string.equals(ch)) {
-				ch = "\\"+string;
-				break;
-			}
-		}
-		return ch;
-	}
-
-	/**
 	 * @return 初始化过的命令集合
 	 */
 	@Override
@@ -474,10 +453,7 @@ public class CommandAnalyzer implements Analysable
 		StringBuilder builder = new StringBuilder();
 		for (Command command : selected) {
 			builder.append('\n');
-			builder.append("commandName-->").append(command.commandName).append('\n');
-			builder.append("paramCount-->").append(command.paramCount).append('\n');
-			builder.append("delimiter-->").append(command.delimiter).append('\n');
-			builder.append("description-->").append(command.description).append('\n');
+			CmdUtils.appendCommandAttribute(command, builder);
 			Method method = methodsMap.get(command.commandName+
 					(command.paramCount == -1 ? 
 							(command.parameters == null ? 0 : command.parameters.length)
@@ -485,18 +461,20 @@ public class CommandAnalyzer implements Analysable
 			if(method == null) method = methodsMap.get(command.commandName + "$");
 			//如果最终找到了
 			if(method != null) {
-				builder.append("handlingMethod-->").append(method.toGenericString()).append('\n');
-				builder.append("analyzer_id-->").append(getId()).append('\n');
+				builder .append("handlingMethod-->")
+						.append(CmdUtils.getSimpleMethodSignature(method.toGenericString())).append('\n');
+				builder .append("analyzer_id-->").append(getId()).append('\n');
 			}
 			//有可能这个command对应了好多个handlingMethod，一点一点找吧
 			else {
 				Set<Entry<String,Method>> entrySet = methodsMap.entrySet();
 				for (Entry<String, Method> entry : entrySet) {
 					String key = entry.getKey();
-					if(isBeginWith(commandName, key, null)) {
-						builder.append("handlingMethod-->")
-						.append(entry.getValue().toGenericString()).append('\n');
-						builder.append("analyzer_id-->").append(getId()).append('\n');
+					if(CmdUtils.isBeginWith(commandName, key, null)) {
+						builder .append("handlingMethod-->")
+								.append(CmdUtils.getSimpleMethodSignature(entry.getValue().toGenericString()))
+								.append('\n');
+						builder .append("analyzer_id-->").append(getId()).append('\n');
 					}
 				}
 			}

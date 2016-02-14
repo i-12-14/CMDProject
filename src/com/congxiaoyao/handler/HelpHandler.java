@@ -5,15 +5,31 @@ import com.congxiaoyao.cmd.Command;
 import com.congxiaoyao.cmd.CommandName;
 
 /**
- * 单纯的处理帮助命令的Handler
- * 支持的命令有
+ * 基于Analysable的getCommandsDescription、getCommandInfo方法提供帮助命令
  * 'help'			'帮助'
  * 'help'	        '1'		'查看每个命令的详细信息'
  *
  * @version 1.0
  * Created by congxiaoyao on 2016/2/13.
  */
-public class HelpHandler extends CommandHandler {
+public class HelpHandler extends BaseHandler {
+
+    private Analysable analysable;
+
+    public HelpHandler(Analysable analysable) {
+        this.analysable = analysable;
+    }
+
+    public HelpHandler() {
+    }
+
+    @Override
+    public Analysable getAnalysable() {
+        if (analysable != null) {
+            return analysable;
+        }
+        return super.getAnalysable();
+    }
 
     /**
      * 输出帮助信息
@@ -36,7 +52,7 @@ public class HelpHandler extends CommandHandler {
     }
 
     @Override
-    CommandHandler registerCommands() {
+    BaseHandler registerCommands() {
         Analysable analysable = getAnalysable();
         analysable.addCommand(new Command("help",	"帮助"));
         analysable.addCommand(new Command("help",	     1,	"查看每个命令的详细信息"));

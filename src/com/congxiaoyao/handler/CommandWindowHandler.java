@@ -25,7 +25,7 @@ import javax.swing.*;
  * @date 2016.2.2
  * @version 1.2
  */
-public class CommandWindowHandler extends CommandHandler{
+public class CommandWindowHandler extends BaseHandler {
 	
 	private CommandWindow window;
 
@@ -63,15 +63,13 @@ public class CommandWindowHandler extends CommandHandler{
 	 * 这就是所谓的参数拦截特性，拦截的是window命令的max参数
 	 * @param arg
 	 */
-	@OnlyCare("max")
 	@CommandName("window")
-	public void maxSizeWindow(String arg) {
+	public void maxSizeWindow(@OnlyCare("max")String arg) {
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 
-	@OnlyCare("full")
 	@CommandName("window")
-	public void handleFull() {
+	public void handleFull(@OnlyCare("full")String full) {
 		int size = window.getFontSize();
 		window.closeWindow();
 		window = new CommandWindow(true);
@@ -82,8 +80,7 @@ public class CommandWindowHandler extends CommandHandler{
 	}
 
 	@CommandName("window")
-	@OnlyCare("nobar")
-	public void handleNoBar() {
+	public void handleNoBar(@OnlyCare String nobar) {
 		int size = window.getFontSize();
 		window.closeWindow();
 		window = new CommandWindow(window.getWidth(),window.getHeight());
@@ -156,7 +153,7 @@ public class CommandWindowHandler extends CommandHandler{
 	 * 这个函数添加的所有命令的处理方法已经被CommandWindowHandler中的处理函数实现了
      */
 	@Override
-	public CommandHandler registerCommands() {
+	public BaseHandler registerCommands() {
 		Analysable analysable = getAnalysable();
 		analysable.addCommand(new Command("720p",	"设置窗口尺寸为720P"));
 		analysable.addCommand(new Command("cls",	"清屏"));

@@ -2,6 +2,7 @@ package com.congxiaoyao;
 
 import com.congxiaoyao.cmd.*;
 import com.congxiaoyao.handler.CommandAnalyzerHandler;
+import com.congxiaoyao.handler.CommandManagementHandler;
 import com.congxiaoyao.handler.CommandWindowHandler;
 import com.congxiaoyao.handler.HelpHandler;
 
@@ -18,9 +19,10 @@ public class MainClass {
 
 		//绑定命令的处理函数所定义的类的实例，可以是多个
 		analyzer = CommandAnalyzerManager.getInstance();
-		CommandAnalyzerManager.handleWith(new CommandWindowHandler(window));
-		CommandAnalyzerManager.handleWith(new HelpHandler());
 		CommandAnalyzerManager.handleWith(new MainClass());
+		CommandAnalyzerManager.handleWith(new HelpHandler());
+		CommandAnalyzerManager.handleWith(new CommandManagementHandler());
+		CommandAnalyzerManager.handleWith(new CommandWindowHandler(window));
 		CommandAnalyzerManager.handleWith(new CommandAnalyzerHandler().registerCommands());
 
 		//动态的添加和删除命令
@@ -33,11 +35,12 @@ public class MainClass {
 	}
 
 	@CommandName
-	public static void handleWelcome() {
+	public static final void handleWelcome() {
 		System.out.println("\n\n本demo展示了这套框架的基本使用方法\n"
 				+ "这里添加了一些有关这个窗口的操作的命令\n"
 				+ "并且已经实现了相应功能，可以输入help进行查看\n"
 				+ "具体工作原理及使用方式见CommandAnalyzer类头注释\n"
 				+ "\4");
 	}
+
 }

@@ -69,6 +69,31 @@ public class CommandAnalyzerManager implements Analysable{
 	}
 
 	/**
+	 * 添加一个CommandAnalyzer,如果传入的analyzer的id为-1 将随机的为其生成一个id
+	 * @param analyzer 所维护的命令的集合必须与类内其他CommandAnalyzer内所维护的命令集合相同(同一个对象)
+	 *                 否则将添加不成功
+	 * @return 添加成功返回true 否则false
+     */
+	public boolean addCommandAnalyzer(CommandAnalyzer analyzer) {
+		if (analyzer == null) return false;
+		if (analyzers.size() == 0) {
+			analyzers.add(analyzer);
+			if (analyzer.getId() == -1) {
+				analyzer.setId(new Random().nextInt(100000));
+			}
+			return true;
+		}
+		if (analyzer.getCommands() == analyzers.iterator().next().getCommands()) {
+			analyzers.add(analyzer);
+			if (analyzer.getId() == -1) {
+				analyzer.setId(new Random().nextInt(100000));
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * 每一次调用addHandlingObject都会新建一个analyzer并放入一个set中，这里就是根据他们的id来移除之
 	 * @param id
      */
@@ -158,10 +183,7 @@ public class CommandAnalyzerManager implements Analysable{
 		List<Command> selected = getCommandsByName(commandName, getCommands(),getCommandsDirectory());
 		for (Command command : selected) {
 			builder.append('\n');
-			builder.append("commandName-->").append(command.commandName).append('\n');
-			builder.append("paramCount-->").append(command.paramCount).append('\n');
-			builder.append("delimiter-->").append(command.delimiter).append('\n');
-			builder.append("description-->").append(command.description).append('\n');
+			CmdUtils.appendCommandAttribute(command, builder);
 			for (CommandAnalyzer analyzer : analyzers) {
 				Method method = analyzer.methodsMap.get(command.commandName+
 						(command.paramCount == -1 ? 
@@ -169,8 +191,10 @@ public class CommandAnalyzerManager implements Analysable{
 										: command.paramCount));
 				if(method == null) method = analyzer.methodsMap.get(command.commandName + "$");
 				if(method != null) {
-					builder.append("handlingMethod-->").append(method.toGenericString()).append('\n');
-					builder.append("analyzer_id-->").append(analyzer.getId()).append('\n');
+					builder .append("handlingMethod-->")
+							.append(CmdUtils.getSimpleMethodSignature(method.toGenericString()))
+							.append('\n');
+					builder .append("analyzer_id-->").append(analyzer.getId()).append('\n');
 					break;
 				}
 				//有可能这个command对应了好多个handlingMethod，一点一点找吧
@@ -178,10 +202,11 @@ public class CommandAnalyzerManager implements Analysable{
 					Set<Entry<String,Method>> entrySet = analyzer.methodsMap.entrySet();
 					for (Entry<String, Method> entry : entrySet) {
 						String key = entry.getKey();
-						if(CommandAnalyzer.isBeginWith(commandName, key, null)) {
-							builder.append("handlingMethod-->")
-							.append(entry.getValue().toGenericString()).append('\n');
-							builder.append("analyzer_id-->").append(analyzer.getId()).append('\n');
+						if(CmdUtils.isBeginWith(commandName, key, null)) {
+							builder	.append("handlingMethod-->")
+									.append(CmdUtils.getSimpleMethodSignature(entry.getValue().toGenericString()))
+									.append('\n');
+							builder	.append("analyzer_id-->").append(analyzer.getId()).append('\n');
 						}
 					}
 				}
