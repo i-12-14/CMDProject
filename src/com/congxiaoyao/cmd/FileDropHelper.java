@@ -14,7 +14,8 @@ import java.util.List;
 /**
  * 文件拖拽监听，可与CommandWindow绑定，将会监听拖入CommandWindow的文件
  * 并将文件通过{@code onFileDrop}函数通知外界
- * 
+ * 绑定时注意参数Component参数传CommandWindow的TextArea
+ *
  * @version 1.0
  * @author congxiaoyao
  * @date 2016.1.24
@@ -22,7 +23,6 @@ import java.util.List;
 public class FileDropHelper {
 	
 	public FileDropHelper(Component c) {
-		
 		new DropTarget(c, new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {

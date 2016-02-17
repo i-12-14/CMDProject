@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * public void foo( @OnlyCare String hello, @OnlyCare String world){
  *     System.out.println("foo hello world");
  * }
- * 注意要想使用这个特性请在编译时开启将参数名编译进去
+ * 注意要想使用这个特性请在编译时使用javac的-parameters参数
  *
  * </pre>
  *

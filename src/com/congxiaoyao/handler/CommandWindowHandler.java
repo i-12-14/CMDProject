@@ -61,15 +61,16 @@ public class CommandWindowHandler extends BaseHandler {
 
 	/**
 	 * 这就是所谓的参数拦截特性，拦截的是window命令的max参数
-	 * @param arg
 	 */
+    @OnlyCare("max")
 	@CommandName("window")
-	public void maxSizeWindow(@OnlyCare("max")String arg) {
+	public void maxSizeWindow() {
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 
+    @OnlyCare("full")
 	@CommandName("window")
-	public void handleFull(@OnlyCare("full")String full) {
+	public void handleFull() {
 		int size = window.getFontSize();
 		window.closeWindow();
 		window = new CommandWindow(true);
@@ -79,8 +80,9 @@ public class CommandWindowHandler extends BaseHandler {
 		window.setOnSubmitListener(content -> getAnalysable().process(content));
 	}
 
+	@OnlyCare("nobar")
 	@CommandName("window")
-	public void handleNoBar(@OnlyCare String nobar) {
+	public void handleNoBar() {
 		int size = window.getFontSize();
 		window.closeWindow();
 		window = new CommandWindow(window.getWidth(),window.getHeight());

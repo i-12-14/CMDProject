@@ -4,9 +4,12 @@ import java.util.Arrays;
 
 /**
  * 请在cmd文件夹下配置values.cmd文件，配置好的所有的命令以这个对象的形式来进行管理
+ * 或者通过构造方法构造出来也可以，通过一个静态的工厂方法？也可以构造出来
+ * @see #forName(String)
+ *
  * @author congxiaoyao
  * @date 2016.1.19
- * @version 1.4
+ * @version 1.4.1
  */
 
 public class Command
@@ -36,7 +39,7 @@ public class Command
 	}
 
 	public Command(String commandName ,  String description){
-		this(commandName, 0, description);
+		this(commandName, -1, description);
 	}
 	
 	public Command(String commandName) {
@@ -65,8 +68,31 @@ public class Command
 		builder.append(description).append("'");
 		return builder.toString();
 	}
-	
-	@Override
+
+    /**
+     * @param commandName
+     * @return 跟一参的构造函数构造出来的一样
+     */
+    public static Command forName(String commandName) {
+        return new Command(commandName);
+    }
+
+    public Command setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+        return this;
+    }
+
+    public Command setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public Command setParamCount(int paramCount) {
+        this.paramCount = paramCount;
+        return this;
+    }
+
+    @Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Command) {
 			Command command = (Command) obj;

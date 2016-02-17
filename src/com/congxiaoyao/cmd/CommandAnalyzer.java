@@ -38,8 +38,14 @@ import java.util.Map.Entry;
  * 
  * <p>关于可变参数命令</p>
  * 可变参数命令是指在参数定义的时候并不关心准确的参数个数（paramCount要标为-1），用户输几个我就处理几个，这样的话
- * 想要拦截可变参数命令，处理函数的参数可以是Command类型、多参且都是String类型（要正好与这次用户输入的参数个数匹配）
- * 或String...类型。如果以Command作为参数类型，其对象中的paramCount为-1，请以parameters（String数组）的长度为准
+ * 想要拦截可变参数命令，处理函数的参数可以是Command类型或String...类型。
+ * 如果以Command作为参数类型，其对象中的paramCount为-1，请以parameters（String数组）的长度为准
+ * 当然，除了上面两种情况，处理函数的参数个数及类型也是可以随意定义的 但要想使这个处理函数顺利的处理这条命令
+ * 处理函数定义的参数要正好与这次用户输入的参数个数匹配
+ * 所以，对于某个确定参数的命令，定义时可以不用标明参数个数，直接编写相应的处理函数即可完成处理（不存在重载）
+ * 如 假设有如下定义的命令     'foo'   '1'     ' '     '复杂的定义方式'
+ * 可以简化为如下定义          'foo'                   '简单的定义方式'
+ * 处理函数的写法不变，但命令定义可以简化
  *
  * <p>关于动态特性</p>
  * 支持命令的动态申请，可以通过代码甚至是命令添加一条命令 见{@code CommandAnalyzer#addCommand(Command)}
@@ -57,15 +63,16 @@ import java.util.Map.Entry;
  * 对于一参命令,其处理函数可以通过OnlyCare注解过滤掉其他的参数，只在用户输入注解关心的参数时才会回调这个函数例如
  * 	
  * <hr><pre>
- * <code>@CommandName("screen")
  * <code>@OnlyCare("max")
- * public void maxSizeWindow(String arg) {
+ * <code>@CommandName("screen")
+ * public void maxSizeWindow() {
  * 		//只有用户输入 ‘screen max’ 的时候此函数才会被回调
- * 		//参数arg也可以不写
+ * 		//如果函数有参数，需要将OnlyCare注解写在关心的那个参数旁边
  * }
  * </pre><hr>
+ * 更加详细的使用方法见{@code OnlyCare}类头注释
  * 
- * @version 1.4
+ * @version 1.4.1
  * @date 2016.1.19
  * @author congxiaoyao
  */
@@ -149,9 +156,8 @@ public class CommandAnalyzer implements Analysable
 		Method[] methods = invoker.getClass().getDeclaredMethods();
 		for (Method method : methods) {
 			//只处理public方法
-			int modifiers = method.getModifiers();
-			if (modifiers != 1 && modifiers != 9 && modifiers != 25) continue;
-			//过滤掉没有注解的方法
+			if ((method.getModifiers()&0x01) != 1) continue;
+            //过滤掉没有注解的方法
 			if(!method.isAnnotationPresent(CommandName.class)) continue;
 			//获取上面的注解
 			CommandName commandName = method.getAnnotation(CommandName.class);
@@ -188,6 +194,16 @@ public class CommandAnalyzer implements Analysable
 		if(info == null) return null;
 		for(int i = info[0],len = info[1]+i;i<len;i++) {
 			Command command = commands.get(i);
+            //对于一参无分隔符命令特别处理
+            if(command.delimiter.equals("null") &&
+                    CmdUtils.isBeginWith(command.commandName,content,null)){
+                String param = content.replaceFirst(command.commandName, "");
+                if (param.length() != 0) {
+                    if(command.paramCount == 0 ) return null;
+                    command.parameters = new String[]{param};
+                }
+                return command;
+            }
 			//先看是不是给定字符串是不是当前这个命令类型
 			if (!CmdUtils.isBeginWith(command.commandName, content, command.delimiter)) continue;
 			//然后在去掉命令开头去分析参数
@@ -216,7 +232,7 @@ public class CommandAnalyzer implements Analysable
 	 * @return 如果传入的command处理成功返回true否则返回false
 	 */
 	public boolean handleCommand(Command command) {
-		Method method = null;
+        Method method = null;
 		//对于一参命令的处理函数，可以定义为无参函数加OnlyCare注解的形式，对于一参命令，先尝试寻找无参处理函数
 		if(command.paramCount == 1) {
 			method = methodsMap.get(command.commandName+"0");
@@ -255,7 +271,7 @@ public class CommandAnalyzer implements Analysable
 					method.invoke(invoker, toType(command.parameters[0], type));
 				}
 			}
-			//无参
+			//无参方法
 			else if (paramCount == 0) {
 				//对于无参函数一参命令的特殊情况，尝试敏感参数拦截
 				if (method.isAnnotationPresent(OnlyCare.class)) {
@@ -300,8 +316,7 @@ public class CommandAnalyzer implements Analysable
 				String careWhat = onlyCare.value();
 				if (careWhat.equals("")) {
 					careWhat = parameter.getName();
-					System.out.println(careWhat);
-				}
+                }
 				if (!careWhat.equals(command.parameters[i])) {
 					return false;
 				}

@@ -5,7 +5,7 @@
 %三参		'commandName' 'paramCount' 'description'
 %四参		'commandName' 'paramCount' 'delimiter' 'description'
 %最好只使用英文的commandName，但description随意
-%缺少的参数将被默认参数代替 默认值为 'commandName' '0' ' ' 'null'
+%缺少的参数将被默认参数代替 默认值为 'commandName' '-1' ' ' 'null'
 %如果paramCount不确定用户会输入几个 可以写-1,此时请按照可变参数命令的处理方法处理
 
 %===================================
