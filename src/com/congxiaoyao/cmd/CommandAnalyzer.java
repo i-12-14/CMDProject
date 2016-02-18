@@ -7,16 +7,16 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * ÔÚÕâ¸öÀàÀï½âÊÍÒ»ÏÂÕâÒ»ÕûÌ×ËùÎ½µÄ¿ò¼ÜµÄ¹¤×÷Ô­Àí¼°Ê¹ÓÃ·½·¨
- * ÎÒÏ£ÍûÕâÌ×¿ò¼ÜÄÜ¹»ÎªÊµÏÖÒ»¸öÃüÁîÌáÊ¾·ûÏµÍ³Ìá¹©Ò»Ğ©±ØÒªµÄÖ§³Ö£¬Ê¹µÃ¿ò¼ÜµÄÊ¹ÓÃÕß¿ÉÒÔ×¨×¢ÓÚ´¦ÀíÊÂÎñ
- * ´Ó¶ø²»±ØÔÚÃüÁî¶¨Òå¡¢·ÖÎö¡¢²éÕÒ¡¢Ö´ĞĞµÈÏ¸½ÚÉÏ»¨·ÑÌ«¶àÊ±¼ä
- * 1¡¢ÔÚcmd/values.txtÄÚ¶¨ÒåÒ»¸ö¾ßÌåµÄÃüÁî£¬¶¨ÒåµÄ¸ñÊ½¼ûÎÄ¼şÄÚ×¢ÊÍ
- * 2¡¢ÔÚÈÎÒâÀàÖĞ¶¨ÒåÃüÁîµÄ´¦Àí·½·¨£¬²¢Í¨¹ı×¢½âÓëÃüÁî°ó¶¨
- * 3¡¢¹¹Ôì³öCommandAnalyzerµÄÊµÀı£¬µ÷ÓÃ{@code process(String)}·½·¨¼´¿É´¦ÀíÒ»ÌõÓÃ»§ÊäÈëµÄÄÚÈİ£¬¾ßÌåÊ¹ÓÃ¼û·½·¨×¢ÊÍ
- * ÏÂÃæÊÇĞ¡Àı×Ó£º
- * ÔÚvalues.txtÖĞ¶¨ÒåÃüÁî¶¨ÒåÈçÏÂ
- * <hr><pre>  'help' '²é¿´°ïÖúĞÅÏ¢'
- * Í¨¹ı×¢½â<code>@CommandName</code>°ó¶¨´¦Àíº¯ÊıÓëÃüÁî
+ * åœ¨è¿™ä¸ªç±»é‡Œè§£é‡Šä¸€ä¸‹è¿™ä¸€æ•´å¥—æ‰€è°“çš„æ¡†æ¶çš„å·¥ä½œåŸç†åŠä½¿ç”¨æ–¹æ³•
+ * æˆ‘å¸Œæœ›è¿™å¥—æ¡†æ¶èƒ½å¤Ÿä¸ºå®ç°ä¸€ä¸ªå‘½ä»¤æç¤ºç¬¦ç³»ç»Ÿæä¾›ä¸€äº›å¿…è¦çš„æ”¯æŒï¼Œä½¿å¾—æ¡†æ¶çš„ä½¿ç”¨è€…å¯ä»¥ä¸“æ³¨äºå¤„ç†äº‹åŠ¡
+ * ä»è€Œä¸å¿…åœ¨å‘½ä»¤å®šä¹‰ã€åˆ†æã€æŸ¥æ‰¾ã€æ‰§è¡Œç­‰ç»†èŠ‚ä¸ŠèŠ±è´¹å¤ªå¤šæ—¶é—´
+ * 1ã€åœ¨cmd/values.txtå†…å®šä¹‰ä¸€ä¸ªå…·ä½“çš„å‘½ä»¤ï¼Œå®šä¹‰çš„æ ¼å¼è§æ–‡ä»¶å†…æ³¨é‡Š
+ * 2ã€åœ¨ä»»æ„ç±»ä¸­å®šä¹‰å‘½ä»¤çš„å¤„ç†æ–¹æ³•ï¼Œå¹¶é€šè¿‡æ³¨è§£ä¸å‘½ä»¤ç»‘å®š
+ * 3ã€æ„é€ å‡ºCommandAnalyzerçš„å®ä¾‹ï¼Œè°ƒç”¨{@code process(String)}æ–¹æ³•å³å¯å¤„ç†ä¸€æ¡ç”¨æˆ·è¾“å…¥çš„å†…å®¹ï¼Œå…·ä½“ä½¿ç”¨è§æ–¹æ³•æ³¨é‡Š
+ * ä¸‹é¢æ˜¯å°ä¾‹å­ï¼š
+ * åœ¨values.txtä¸­å®šä¹‰å‘½ä»¤å®šä¹‰å¦‚ä¸‹
+ * <hr><pre>  'help' 'æŸ¥çœ‹å¸®åŠ©ä¿¡æ¯'
+ * é€šè¿‡æ³¨è§£<code>@CommandName</code>ç»‘å®šå¤„ç†å‡½æ•°ä¸å‘½ä»¤
  * public class Case{
  * 		<code>@CommandName("help")
  * 		public void foo(){
@@ -28,53 +28,53 @@ import java.util.Map.Entry;
  * 		}
  * }
  * </pre><hr>
- * <p>¹ØÓÚÖØÔØÃüÁî</p>
- * ÃüÁîÖ§³Ö¶à²ÎÖØÔØ£¬»Øµ÷´¦Àíº¯ÊıµÄÊ±ºò£¬»á¸ù¾İ´¦Àíº¯Êı²ÎÊıµÄ¸öÊı¼°ÀàĞÍÑ¡ÔñºÏÊÊµÄ´¦Àíº¯Êı½øĞĞ»Øµ÷
- * µ±ÃüÁî±»Ê¶±ğ³öÀ´ºó£¬»áÏÈÈ¥Ñ°ÕÒ²ÎÊı¸öÊıÓëÃüÁîËùĞ¯´øµÄ²ÎÊı¸öÊıÏàµÈµÄ´¦Àíº¯Êı»Øµ÷Ö®
- * Èç¹ûÕÒ²»µ½£¬»áÔÙ´ÎÑ°ÕÒ²ÎÊıÎªCommand»òString...ÀàĞÍµÄ´¦Àíº¯Êı£¬ÒòÎªÕâÁ½ÖÖÀàĞÍ¿ÉÒÔÀ¹½ØÈÎÒâ²ÎÊı¸öÊı
- * Èç¹ûÒÀÈ»ÕÒ²»µ½ÔòÈÏÎª´¦ÀíÊ§°Ü
- * Èç¹û¶ÔÍ¬Ò»¸ö·ÇÖØÔØµÄÃüÁî¶¨ÒåÁË¶à¸ö´¦Àíº¯Êı£¬»ò¶ÔÓÚÒ»¸öÖØÔØÃüÁî¶¨ÒåÁË¶à¸ö´¦ÀíÏàÍ¬²ÎÊı¸öÊıµÄ´¦Àíº¯Êı
- * »áµ¼ÖÂÆä¶àÓàµÄ´¦Àíº¯ÊıÊ§Ğ§£¬Çë¾¡Á¿±ÜÃâÖØ¸´
+ * <p>å…³äºé‡è½½å‘½ä»¤</p>
+ * å‘½ä»¤æ”¯æŒå¤šå‚é‡è½½ï¼Œå›è°ƒå¤„ç†å‡½æ•°çš„æ—¶å€™ï¼Œä¼šæ ¹æ®å¤„ç†å‡½æ•°å‚æ•°çš„ä¸ªæ•°åŠç±»å‹é€‰æ‹©åˆé€‚çš„å¤„ç†å‡½æ•°è¿›è¡Œå›è°ƒ
+ * å½“å‘½ä»¤è¢«è¯†åˆ«å‡ºæ¥åï¼Œä¼šå…ˆå»å¯»æ‰¾å‚æ•°ä¸ªæ•°ä¸å‘½ä»¤æ‰€æºå¸¦çš„å‚æ•°ä¸ªæ•°ç›¸ç­‰çš„å¤„ç†å‡½æ•°å›è°ƒä¹‹
+ * å¦‚æœæ‰¾ä¸åˆ°ï¼Œä¼šå†æ¬¡å¯»æ‰¾å‚æ•°ä¸ºCommandæˆ–String...ç±»å‹çš„å¤„ç†å‡½æ•°ï¼Œå› ä¸ºè¿™ä¸¤ç§ç±»å‹å¯ä»¥æ‹¦æˆªä»»æ„å‚æ•°ä¸ªæ•°
+ * å¦‚æœä¾ç„¶æ‰¾ä¸åˆ°åˆ™è®¤ä¸ºå¤„ç†å¤±è´¥
+ * å¦‚æœå¯¹åŒä¸€ä¸ªéé‡è½½çš„å‘½ä»¤å®šä¹‰äº†å¤šä¸ªå¤„ç†å‡½æ•°ï¼Œæˆ–å¯¹äºä¸€ä¸ªé‡è½½å‘½ä»¤å®šä¹‰äº†å¤šä¸ªå¤„ç†ç›¸åŒå‚æ•°ä¸ªæ•°çš„å¤„ç†å‡½æ•°
+ * ä¼šå¯¼è‡´å…¶å¤šä½™çš„å¤„ç†å‡½æ•°å¤±æ•ˆï¼Œè¯·å°½é‡é¿å…é‡å¤
  * 
- * <p>¹ØÓÚ¿É±ä²ÎÊıÃüÁî</p>
- * ¿É±ä²ÎÊıÃüÁîÊÇÖ¸ÔÚ²ÎÊı¶¨ÒåµÄÊ±ºò²¢²»¹ØĞÄ×¼È·µÄ²ÎÊı¸öÊı£¨paramCountÒª±êÎª-1£©£¬ÓÃ»§Êä¼¸¸öÎÒ¾Í´¦Àí¼¸¸ö£¬ÕâÑùµÄ»°
- * ÏëÒªÀ¹½Ø¿É±ä²ÎÊıÃüÁî£¬´¦Àíº¯ÊıµÄ²ÎÊı¿ÉÒÔÊÇCommandÀàĞÍ»òString...ÀàĞÍ¡£
- * Èç¹ûÒÔCommand×÷Îª²ÎÊıÀàĞÍ£¬Æä¶ÔÏóÖĞµÄparamCountÎª-1£¬ÇëÒÔparameters£¨StringÊı×é£©µÄ³¤¶ÈÎª×¼
- * µ±È»£¬³ıÁËÉÏÃæÁ½ÖÖÇé¿ö£¬´¦Àíº¯ÊıµÄ²ÎÊı¸öÊı¼°ÀàĞÍÒ²ÊÇ¿ÉÒÔËæÒâ¶¨ÒåµÄ µ«ÒªÏëÊ¹Õâ¸ö´¦Àíº¯ÊıË³ÀûµÄ´¦ÀíÕâÌõÃüÁî
- * ´¦Àíº¯Êı¶¨ÒåµÄ²ÎÊıÒªÕıºÃÓëÕâ´ÎÓÃ»§ÊäÈëµÄ²ÎÊı¸öÊıÆ¥Åä
- * ËùÒÔ£¬¶ÔÓÚÄ³¸öÈ·¶¨²ÎÊıµÄÃüÁî£¬¶¨ÒåÊ±¿ÉÒÔ²»ÓÃ±êÃ÷²ÎÊı¸öÊı£¬Ö±½Ó±àĞ´ÏàÓ¦µÄ´¦Àíº¯Êı¼´¿ÉÍê³É´¦Àí£¨²»´æÔÚÖØÔØ£©
- * Èç ¼ÙÉèÓĞÈçÏÂ¶¨ÒåµÄÃüÁî     'foo'   '1'     ' '     '¸´ÔÓµÄ¶¨Òå·½Ê½'
- * ¿ÉÒÔ¼ò»¯ÎªÈçÏÂ¶¨Òå          'foo'                   '¼òµ¥µÄ¶¨Òå·½Ê½'
- * ´¦Àíº¯ÊıµÄĞ´·¨²»±ä£¬µ«ÃüÁî¶¨Òå¿ÉÒÔ¼ò»¯
+ * <p>å…³äºå¯å˜å‚æ•°å‘½ä»¤</p>
+ * å¯å˜å‚æ•°å‘½ä»¤æ˜¯æŒ‡åœ¨å‚æ•°å®šä¹‰çš„æ—¶å€™å¹¶ä¸å…³å¿ƒå‡†ç¡®çš„å‚æ•°ä¸ªæ•°ï¼ˆparamCountè¦æ ‡ä¸º-1ï¼‰ï¼Œç”¨æˆ·è¾“å‡ ä¸ªæˆ‘å°±å¤„ç†å‡ ä¸ªï¼Œè¿™æ ·çš„è¯
+ * æƒ³è¦æ‹¦æˆªå¯å˜å‚æ•°å‘½ä»¤ï¼Œå¤„ç†å‡½æ•°çš„å‚æ•°å¯ä»¥æ˜¯Commandç±»å‹æˆ–String...ç±»å‹ã€‚
+ * å¦‚æœä»¥Commandä½œä¸ºå‚æ•°ç±»å‹ï¼Œå…¶å¯¹è±¡ä¸­çš„paramCountä¸º-1ï¼Œè¯·ä»¥parametersï¼ˆStringæ•°ç»„ï¼‰çš„é•¿åº¦ä¸ºå‡†
+ * å½“ç„¶ï¼Œé™¤äº†ä¸Šé¢ä¸¤ç§æƒ…å†µï¼Œå¤„ç†å‡½æ•°çš„å‚æ•°ä¸ªæ•°åŠç±»å‹ä¹Ÿæ˜¯å¯ä»¥éšæ„å®šä¹‰çš„ ä½†è¦æƒ³ä½¿è¿™ä¸ªå¤„ç†å‡½æ•°é¡ºåˆ©çš„å¤„ç†è¿™æ¡å‘½ä»¤
+ * å¤„ç†å‡½æ•°å®šä¹‰çš„å‚æ•°è¦æ­£å¥½ä¸è¿™æ¬¡ç”¨æˆ·è¾“å…¥çš„å‚æ•°ä¸ªæ•°åŒ¹é…
+ * æ‰€ä»¥ï¼Œå¯¹äºæŸä¸ªç¡®å®šå‚æ•°çš„å‘½ä»¤ï¼Œå®šä¹‰æ—¶å¯ä»¥ä¸ç”¨æ ‡æ˜å‚æ•°ä¸ªæ•°ï¼Œç›´æ¥ç¼–å†™ç›¸åº”çš„å¤„ç†å‡½æ•°å³å¯å®Œæˆå¤„ç†ï¼ˆä¸å­˜åœ¨é‡è½½ï¼‰
+ * å¦‚ å‡è®¾æœ‰å¦‚ä¸‹å®šä¹‰çš„å‘½ä»¤     'foo'   '1'     ' '     'å¤æ‚çš„å®šä¹‰æ–¹å¼'
+ * å¯ä»¥ç®€åŒ–ä¸ºå¦‚ä¸‹å®šä¹‰          'foo'                   'ç®€å•çš„å®šä¹‰æ–¹å¼'
+ * å¤„ç†å‡½æ•°çš„å†™æ³•ä¸å˜ï¼Œä½†å‘½ä»¤å®šä¹‰å¯ä»¥ç®€åŒ–
  *
- * <p>¹ØÓÚ¶¯Ì¬ÌØĞÔ</p>
- * Ö§³ÖÃüÁîµÄ¶¯Ì¬ÉêÇë£¬¿ÉÒÔÍ¨¹ı´úÂëÉõÖÁÊÇÃüÁîÌí¼ÓÒ»ÌõÃüÁî ¼û{@code CommandAnalyzer#addCommand(Command)}
- * Ö§³ÖÃüÁîµÄ¶¯Ì¬É¾³ı£¬¿ÉÒÔÍ¨¹ı´úÂëÉõÖÁÊÇÃüÁîÉ¾³ıÒ»ÌõÃüÁî¼û{@code CommandAnalyzer#removeCommand(Command)}
- * Ö§³Ö´¦Àíº¯ÊıµÄ¶¯Ì¬Ìí¼Ó£¬Í¨¹ı{@code DynamicClassLoader}ÊµÏÖÁËclassÎÄ¼şµÄÈÈ¼ÓÔØ
- * ¶¯Ì¬ÌØĞÔÊ¹µÃ³ÌĞòÔËĞĞÆğÀ´Ö®ºóÈÔÈ»¿ÉÒÔ¶¯Ì¬µÄÌí¼Ó¡¢É¾³ıÃüÁîÉõÖÁ¿ÉÒÔ¸Ä±äÃüÁîµÄ´¦Àí·½Ê½£¬ÁïµÄ²»ĞĞ
+ * <p>å…³äºåŠ¨æ€ç‰¹æ€§</p>
+ * æ”¯æŒå‘½ä»¤çš„åŠ¨æ€ç”³è¯·ï¼Œå¯ä»¥é€šè¿‡ä»£ç ç”šè‡³æ˜¯å‘½ä»¤æ·»åŠ ä¸€æ¡å‘½ä»¤ è§{@code CommandAnalyzer#addCommand(Command)}
+ * æ”¯æŒå‘½ä»¤çš„åŠ¨æ€åˆ é™¤ï¼Œå¯ä»¥é€šè¿‡ä»£ç ç”šè‡³æ˜¯å‘½ä»¤åˆ é™¤ä¸€æ¡å‘½ä»¤è§{@code CommandAnalyzer#removeCommand(Command)}
+ * æ”¯æŒå¤„ç†å‡½æ•°çš„åŠ¨æ€æ·»åŠ ï¼Œé€šè¿‡{@code DynamicClassLoader}å®ç°äº†classæ–‡ä»¶çš„çƒ­åŠ è½½
+ * åŠ¨æ€ç‰¹æ€§ä½¿å¾—ç¨‹åºè¿è¡Œèµ·æ¥ä¹‹åä»ç„¶å¯ä»¥åŠ¨æ€çš„æ·»åŠ ã€åˆ é™¤å‘½ä»¤ç”šè‡³å¯ä»¥æ”¹å˜å‘½ä»¤çš„å¤„ç†æ–¹å¼ï¼Œæºœçš„ä¸è¡Œ
  *
- * <p>¹ØÓÚ´¦Àíº¯ÊıµÄ¶àÀà·Ö²¼ÎÊÌâ£¬¼û{@code CommandAnalyzerManager}ÀàÍ·×¢ÊÍ</p>
+ * <p>å…³äºå¤„ç†å‡½æ•°çš„å¤šç±»åˆ†å¸ƒé—®é¢˜ï¼Œè§{@code CommandAnalyzerManager}ç±»å¤´æ³¨é‡Š</p>
  * 
- * <p>¹ØÓÚ×Ô¶¯²ÎÊıÀàĞÍ×ª»»</p>
- * Èç¹ûÃüÁîÖĞµÄ²ÎÊıÊÇ»ù±¾Êı¾İÀàĞÍµÄÒ»ÖÖ ÈçÉèÖÃ´°¿Ú³ß´çÊ±£¬ÃüÁîµÄ²ÎÊıÊµ¼ÊÊÇintĞÍµÄ
- * ÄÇÃ´Ö»Òª½«´¦Àíº¯ÊıµÄ²ÎÊıÀàĞÍ¶¨ÒåÎªint»òIntegerÀàĞÍ£¬CommandAnalyzer»á×Ô¶¯½«StringÀàĞÍµÄ²ÎÊı×ªÎªint/IntegerĞÍ
+ * <p>å…³äºè‡ªåŠ¨å‚æ•°ç±»å‹è½¬æ¢</p>
+ * å¦‚æœå‘½ä»¤ä¸­çš„å‚æ•°æ˜¯åŸºæœ¬æ•°æ®ç±»å‹çš„ä¸€ç§ å¦‚è®¾ç½®çª—å£å°ºå¯¸æ—¶ï¼Œå‘½ä»¤çš„å‚æ•°å®é™…æ˜¯intå‹çš„
+ * é‚£ä¹ˆåªè¦å°†å¤„ç†å‡½æ•°çš„å‚æ•°ç±»å‹å®šä¹‰ä¸ºintæˆ–Integerç±»å‹ï¼ŒCommandAnalyzerä¼šè‡ªåŠ¨å°†Stringç±»å‹çš„å‚æ•°è½¬ä¸ºint/Integerå‹
  * 
- * <p>¹ØÓÚÃô¸Ğ²ÎÊıÀ¹½Ø</p>
- * ¶ÔÓÚÒ»²ÎÃüÁî,Æä´¦Àíº¯Êı¿ÉÒÔÍ¨¹ıOnlyCare×¢½â¹ıÂËµôÆäËûµÄ²ÎÊı£¬Ö»ÔÚÓÃ»§ÊäÈë×¢½â¹ØĞÄµÄ²ÎÊıÊ±²Å»á»Øµ÷Õâ¸öº¯ÊıÀıÈç
+ * <p>å…³äºæ•æ„Ÿå‚æ•°æ‹¦æˆª</p>
+ * å¯¹äºä¸€å‚å‘½ä»¤,å…¶å¤„ç†å‡½æ•°å¯ä»¥é€šè¿‡OnlyCareæ³¨è§£è¿‡æ»¤æ‰å…¶ä»–çš„å‚æ•°ï¼Œåªåœ¨ç”¨æˆ·è¾“å…¥æ³¨è§£å…³å¿ƒçš„å‚æ•°æ—¶æ‰ä¼šå›è°ƒè¿™ä¸ªå‡½æ•°ä¾‹å¦‚
  * 	
  * <hr><pre>
  * <code>@OnlyCare("max")
  * <code>@CommandName("screen")
  * public void maxSizeWindow() {
- * 		//Ö»ÓĞÓÃ»§ÊäÈë ¡®screen max¡¯ µÄÊ±ºò´Ëº¯Êı²Å»á±»»Øµ÷
- * 		//Èç¹ûº¯ÊıÓĞ²ÎÊı£¬ĞèÒª½«OnlyCare×¢½âĞ´ÔÚ¹ØĞÄµÄÄÇ¸ö²ÎÊıÅÔ±ß
+ * 		//åªæœ‰ç”¨æˆ·è¾“å…¥ â€˜screen maxâ€™ çš„æ—¶å€™æ­¤å‡½æ•°æ‰ä¼šè¢«å›è°ƒ
+ * 		//å¦‚æœå‡½æ•°æœ‰å‚æ•°ï¼Œéœ€è¦å°†OnlyCareæ³¨è§£å†™åœ¨å…³å¿ƒçš„é‚£ä¸ªå‚æ•°æ—è¾¹
  * }
  * </pre><hr>
- * ¸ü¼ÓÏêÏ¸µÄÊ¹ÓÃ·½·¨¼û{@code OnlyCare}ÀàÍ·×¢ÊÍ
+ * æ›´åŠ è¯¦ç»†çš„ä½¿ç”¨æ–¹æ³•è§{@code OnlyCare}ç±»å¤´æ³¨é‡Š
  * 
  * @version 1.4.1
  * @date 2016.1.19
- * @author congxiaoyao
+ * @author congxiaoyao  edit 
  */
 
 public class CommandAnalyzer implements Analysable
@@ -83,13 +83,13 @@ public class CommandAnalyzer implements Analysable
 	private Object invoker;
 	
 	private List<Command> commands = new ArrayList<>();
-	//¿ÉÒÔÍ¨¹ıÕâ¸ömap°´ÕÕÊ××ÖÄ¸ÔÚcommandsÖĞ²éÕÒ£¬Ìá¸ßĞ§ÂÊ£¬Õâ¸öint[]¼ÇÂ¼ÁËstartIndex¸úlengthÁ½¸öÖµ
+	//å¯ä»¥é€šè¿‡è¿™ä¸ªmapæŒ‰ç…§é¦–å­—æ¯åœ¨commandsä¸­æŸ¥æ‰¾ï¼Œæé«˜æ•ˆç‡ï¼Œè¿™ä¸ªint[]è®°å½•äº†startIndexè·Ÿlengthä¸¤ä¸ªå€¼
 	Map<Character, int[]> commandsDirectory = new HashMap<>();	
 	
 	Map<String, Method> methodsMap = new HashMap<>();
 
 	/**
-	 * @param invoker ÒªÖ´ĞĞµÄ·½·¨ËùÔÚµÄÀàµÄÊµÀı
+	 * @param invoker è¦æ‰§è¡Œçš„æ–¹æ³•æ‰€åœ¨çš„ç±»çš„å®ä¾‹
 	 */
 	public CommandAnalyzer(Object invoker) {
 		this.invoker = invoker;
@@ -105,10 +105,10 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * ½«Ò»ÌõÓÃ»§ÊäÈë¶ªÈëÕâ¸ö·½·¨£¬Ëû»á³¢ÊÔ½âÎöÕâ¸ö×Ö·û´®²¢ÇÒ½âÎö³É¹¦ºó»á³¢ÊÔÖ´ĞĞÕâ¸öÃüÁî
-	 * Ò²¾ÍÊÇÖ±½ÓÈ¥´«ÈëµÄinvokerÄÇ¸öÀàÖĞÈ¥ÕÒµ½¶ÔÓ¦µÄ·½·¨µ÷ÓÃ
-	 * @param content ´ı·ÖÎöµÄÃüÁî
-	 * @return Èç¹ûÃüÁî×îÖÕ³É¹¦Ö´ĞĞ£¬Ôò·µ»Øtrue£¬ÆäËûÇé¿ö·µ»Øfalse
+	 * å°†ä¸€æ¡ç”¨æˆ·è¾“å…¥ä¸¢å…¥è¿™ä¸ªæ–¹æ³•ï¼Œä»–ä¼šå°è¯•è§£æè¿™ä¸ªå­—ç¬¦ä¸²å¹¶ä¸”è§£ææˆåŠŸåä¼šå°è¯•æ‰§è¡Œè¿™ä¸ªå‘½ä»¤
+	 * ä¹Ÿå°±æ˜¯ç›´æ¥å»ä¼ å…¥çš„invokeré‚£ä¸ªç±»ä¸­å»æ‰¾åˆ°å¯¹åº”çš„æ–¹æ³•è°ƒç”¨
+	 * @param content å¾…åˆ†æçš„å‘½ä»¤
+	 * @return å¦‚æœå‘½ä»¤æœ€ç»ˆæˆåŠŸæ‰§è¡Œï¼Œåˆ™è¿”å›trueï¼Œå…¶ä»–æƒ…å†µè¿”å›false
 	 */
 	@Override
 	public boolean process(String content) {
@@ -120,14 +120,14 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * ´Ócmd/values.txtÎÄ¼şÖĞ¶ÁÈ¡ÅäÖÃµÄ½Å±¾ĞÅÏ¢²¢´´½¨ÏàÓ¦µÄcommand¶ÔÏó¼ÓÈëÃüÁî¼¯ºÏ²¢½¨Á¢ÆğÄ¿Â¼·½±ã²éÑ¯
+	 * ä»cmd/values.txtæ–‡ä»¶ä¸­è¯»å–é…ç½®çš„è„šæœ¬ä¿¡æ¯å¹¶åˆ›å»ºç›¸åº”çš„commandå¯¹è±¡åŠ å…¥å‘½ä»¤é›†åˆå¹¶å»ºç«‹èµ·ç›®å½•æ–¹ä¾¿æŸ¥è¯¢
 	 */
 	private void initCommandList() {
 		List<String> params = new ArrayList<>(5);
 		new TextReader("cmd/values.txt") {
 			@Override
 			public void onReadLine(String line) {
-				//È¥×¢ÊÍ¼°¿ÕĞĞ
+				//å»æ³¨é‡ŠåŠç©ºè¡Œ
 				if(line.length() == 0 || line.charAt(0) == '%') return;
 				Command command = CmdUtils.getCommand(line);
 				insertCommand(command);
@@ -136,56 +136,56 @@ public class CommandAnalyzer implements Analysable
 				e.printStackTrace();
 			};
 		}.read();
-		//¸üĞÂÄ¿Â¼ÒÔ·½±ã²éÕÒ
+		//æ›´æ–°ç›®å½•ä»¥æ–¹ä¾¿æŸ¥æ‰¾
 		if(commands.size() != 0) {
 			updateCommandsDirectory();
 		}
 	}
 	
 	/**
-	 * ½¨Á¢ÆğcommandName¸ú´¦ÀíËüµÄº¯Êı£¨´¦Àíº¯Êı£©µÄHashMap,¾ßÌå×ö·¨ÈçÏÂ
-	 * ±éÀúinvokerÖĞËùÓĞµÄmethod£¬¶ÔÓÚÒ»¸ö·ûºÏÌõ¼şµÄmethod£¬ÏòmapÖĞÌí¼ÓÒ»¸öentry£¬Õâ¸ömethod×÷ÎªentryµÄvalue
-	 * ¹ØÓÚ¶ÔÓ¦µÄkey£¬ÓĞÁ½²¿·Ö×é³É£¨commandName + X£©,commandNameÓÉÕâ¸ömethodµÄ×¢ÊÍ»òº¯ÊıÃû»ñµÃ£¬XÊÇÖ¸Õâ¸ö
-	 * methodµÄ²ÎÊı¸öÊı£¬Èç¹ûÓöµ½String...»òCommandÀàĞÍµÄ²ÎÊı£¬ÎÒÃÇÈÏÎªXÎª$
-	 * ¶ÔÓÚ´øÓĞOnlyCare×¢½âµÄ´¦Àíº¯Êı£¬keyµÄÉú³É¹æÔò±äÎªcommandName+OnlyCare
-	 * ¶ÔÓÚ±ê×¼ÃüÃû·ç¸ñµÄÃüÁî¼°´¦Àíº¯Êı£¬²»ĞèÒª¸øCommandName×¢½âÌí¼Ó²ÎÊı£¬¼´¿ÉÍ¨¹ıº¯ÊıÃû½«ÆäËù´ú±íµÄÃüÁî½âÎö³öÀ´
-	 * ±ê×¼ÃüÃû·ç¸ñÒªÇóÃüÁîÖ»ÓÉĞ¡Ğ´×ÖÄ¸»òÊı×Ö×é³É£¬×ÖÄ¸¿ªÍ·£¬´¦Àíº¯ÊıÔÚÃüÁîÃûÇ°Ãæ¼Óhandle¼´¿É£¨handleºóÃæµÄÃüÁîÃû¿ÉËæÒâ×ª»»´óĞ¡Ğ´£©
-	 * Èç ÃüÁîÃû help ´¦Àíº¯ÊıÃû handleHelp
+	 * å»ºç«‹èµ·commandNameè·Ÿå¤„ç†å®ƒçš„å‡½æ•°ï¼ˆå¤„ç†å‡½æ•°ï¼‰çš„HashMap,å…·ä½“åšæ³•å¦‚ä¸‹
+	 * éå†invokerä¸­æ‰€æœ‰çš„methodï¼Œå¯¹äºä¸€ä¸ªç¬¦åˆæ¡ä»¶çš„methodï¼Œå‘mapä¸­æ·»åŠ ä¸€ä¸ªentryï¼Œè¿™ä¸ªmethodä½œä¸ºentryçš„value
+	 * å…³äºå¯¹åº”çš„keyï¼Œæœ‰ä¸¤éƒ¨åˆ†ç»„æˆï¼ˆcommandName + Xï¼‰,commandNameç”±è¿™ä¸ªmethodçš„æ³¨é‡Šæˆ–å‡½æ•°åè·å¾—ï¼ŒXæ˜¯æŒ‡è¿™ä¸ª
+	 * methodçš„å‚æ•°ä¸ªæ•°ï¼Œå¦‚æœé‡åˆ°String...æˆ–Commandç±»å‹çš„å‚æ•°ï¼Œæˆ‘ä»¬è®¤ä¸ºXä¸º$
+	 * å¯¹äºå¸¦æœ‰OnlyCareæ³¨è§£çš„å¤„ç†å‡½æ•°ï¼Œkeyçš„ç”Ÿæˆè§„åˆ™å˜ä¸ºcommandName+OnlyCare
+	 * å¯¹äºæ ‡å‡†å‘½åé£æ ¼çš„å‘½ä»¤åŠå¤„ç†å‡½æ•°ï¼Œä¸éœ€è¦ç»™CommandNameæ³¨è§£æ·»åŠ å‚æ•°ï¼Œå³å¯é€šè¿‡å‡½æ•°åå°†å…¶æ‰€ä»£è¡¨çš„å‘½ä»¤è§£æå‡ºæ¥
+	 * æ ‡å‡†å‘½åé£æ ¼è¦æ±‚å‘½ä»¤åªç”±å°å†™å­—æ¯æˆ–æ•°å­—ç»„æˆï¼Œå­—æ¯å¼€å¤´ï¼Œå¤„ç†å‡½æ•°åœ¨å‘½ä»¤åå‰é¢åŠ handleå³å¯ï¼ˆhandleåé¢çš„å‘½ä»¤åå¯éšæ„è½¬æ¢å¤§å°å†™ï¼‰
+	 * å¦‚ å‘½ä»¤å help å¤„ç†å‡½æ•°å handleHelp
 	 */
 	private void initMethodsMap() {
 		Method[] methods = invoker.getClass().getDeclaredMethods();
 		for (Method method : methods) {
-			//Ö»´¦Àípublic·½·¨
+			//åªå¤„ç†publicæ–¹æ³•
 			if ((method.getModifiers()&0x01) != 1) continue;
-            //¹ıÂËµôÃ»ÓĞ×¢½âµÄ·½·¨
+            //è¿‡æ»¤æ‰æ²¡æœ‰æ³¨è§£çš„æ–¹æ³•
 			if(!method.isAnnotationPresent(CommandName.class)) continue;
-			//»ñÈ¡ÉÏÃæµÄ×¢½â
+			//è·å–ä¸Šé¢çš„æ³¨è§£
 			CommandName commandName = method.getAnnotation(CommandName.class);
 			String value = commandName.value();
-			//Èç¹û×¢½âÖĞÃ»ÓĞ²ÎÊı£¬³¢ÊÔÍ¨¹ıº¯ÊıÃû½âÎöÃüÁîÍ·
+			//å¦‚æœæ³¨è§£ä¸­æ²¡æœ‰å‚æ•°ï¼Œå°è¯•é€šè¿‡å‡½æ•°åè§£æå‘½ä»¤å¤´
 			if(value.length() == 0 && CmdUtils.isBeginWith("handle", method.getName(), null)) {
 				value = method.getName().replaceFirst("handle", "").toLowerCase();
 			}
 			String key = null;
-			//ÓÉÓÚÖØÔØÃüÁîµÄ´æÔÚ£¬²»Í¬µÄº¯Êı¿ÉÄÜ»á´¦Àí²»Í¬µÄÖØÔØÃüÁî
+			//ç”±äºé‡è½½å‘½ä»¤çš„å­˜åœ¨ï¼Œä¸åŒçš„å‡½æ•°å¯èƒ½ä¼šå¤„ç†ä¸åŒçš„é‡è½½å‘½ä»¤
 			int paramCount = method.getParameterCount();
-			//Èç¹û´¦Àíº¯ÊıÖĞÖ»ÓĞÒ»¸ö²ÎÊıÇÒ²ÎÊıÎªCommand»òString[]ÀàĞÍ£¬ÔÚ¹¹ÔìmapÊ±ÒÔÃüÁîÍ·¼Ó$×÷ÎªmapµÄkey
+			//å¦‚æœå¤„ç†å‡½æ•°ä¸­åªæœ‰ä¸€ä¸ªå‚æ•°ä¸”å‚æ•°ä¸ºCommandæˆ–String[]ç±»å‹ï¼Œåœ¨æ„é€ mapæ—¶ä»¥å‘½ä»¤å¤´åŠ $ä½œä¸ºmapçš„key
 			if(paramCount == 1) {
 				Class<?> type = method.getParameterTypes()[0];
 				if(type == Command.class || type == String[].class)
 					key = value + "$";
 				else key = value + paramCount;
 			}
-			//·ñÔòÒÔÃüÁîÍ·¼Ó´¦Àíº¯ÊıµÄ²ÎÊı¸öÊıÎªmapµÄkey
+			//å¦åˆ™ä»¥å‘½ä»¤å¤´åŠ å¤„ç†å‡½æ•°çš„å‚æ•°ä¸ªæ•°ä¸ºmapçš„key
 			else key = value + paramCount;
 			methodsMap.put(key , method);
 		}
 	}
 
 	/**
-	 * ·ÖÎöÒ»Ìõ×Ö·û´®ÊÇ·ñÊÇÒ»Ìõ¸ø¶¨µÄÃüÁî,ÒªÇócommandNameÏàÍ¬ÇÒÄÜ½âÎö³öÏàÍ¬¸öÊıµÄ²ÎÊı
-	 * @param content ¿ØÖÆÌ¨Ìá½»µÄ×Ö·û´®
-	 * @return Èç¹ûÄÜ¹»³É¹¦Æ¥Åä£¬·µ»ØÒ»¸öcommand¶ÔÏó£¬·ñÔò·µ»Ønull
+	 * åˆ†æä¸€æ¡å­—ç¬¦ä¸²æ˜¯å¦æ˜¯ä¸€æ¡ç»™å®šçš„å‘½ä»¤,è¦æ±‚commandNameç›¸åŒä¸”èƒ½è§£æå‡ºç›¸åŒä¸ªæ•°çš„å‚æ•°
+	 * @param content æ§åˆ¶å°æäº¤çš„å­—ç¬¦ä¸²
+	 * @return å¦‚æœèƒ½å¤ŸæˆåŠŸåŒ¹é…ï¼Œè¿”å›ä¸€ä¸ªcommandå¯¹è±¡ï¼Œå¦åˆ™è¿”å›null
 	 */
 	public Command analyze(String content)
 	{
@@ -194,7 +194,7 @@ public class CommandAnalyzer implements Analysable
 		if(info == null) return null;
 		for(int i = info[0],len = info[1]+i;i<len;i++) {
 			Command command = commands.get(i);
-            //¶ÔÓÚÒ»²ÎÎŞ·Ö¸ô·ûÃüÁîÌØ±ğ´¦Àí
+            //å¯¹äºä¸€å‚æ— åˆ†éš”ç¬¦å‘½ä»¤ç‰¹åˆ«å¤„ç†
             if(command.delimiter.equals("null") &&
                     CmdUtils.isBeginWith(command.commandName,content,null)){
                 String param = content.replaceFirst(command.commandName, "");
@@ -204,20 +204,20 @@ public class CommandAnalyzer implements Analysable
                 }
                 return command;
             }
-			//ÏÈ¿´ÊÇ²»ÊÇ¸ø¶¨×Ö·û´®ÊÇ²»ÊÇµ±Ç°Õâ¸öÃüÁîÀàĞÍ
+			//å…ˆçœ‹æ˜¯ä¸æ˜¯ç»™å®šå­—ç¬¦ä¸²æ˜¯ä¸æ˜¯å½“å‰è¿™ä¸ªå‘½ä»¤ç±»å‹
 			if (!CmdUtils.isBeginWith(command.commandName, content, command.delimiter)) continue;
-			//È»ºóÔÚÈ¥µôÃüÁî¿ªÍ·È¥·ÖÎö²ÎÊı
+			//ç„¶ååœ¨å»æ‰å‘½ä»¤å¼€å¤´å»åˆ†æå‚æ•°
 			String contentNew = content.replaceFirst(command.commandName, "");
-			//³õÊ¼»¯²ÎÊı¸öÊı
+			//åˆå§‹åŒ–å‚æ•°ä¸ªæ•°
 			int paramCount = 0;
 			String[] parameters = null;
-			//Èç¹ûÓĞ²ÎÊı£¬Çó¸ø¶¨×Ö·û´®ÖĞ°üº¬µÄ²ÎÊı¸öÊı
+			//å¦‚æœæœ‰å‚æ•°ï¼Œæ±‚ç»™å®šå­—ç¬¦ä¸²ä¸­åŒ…å«çš„å‚æ•°ä¸ªæ•°
 			if (contentNew.length() > 1) {
 				contentNew = contentNew.replaceFirst(command.delimiter, "");
 				parameters = contentNew.split(command.delimiter);
 				paramCount = parameters.length;
 			}
-			//Èç¹ûÇó³öµÄ¸öÊıÓëÕâÌõÃüÁîËù¹æ¶¨µÄÏàÍ¬
+			//å¦‚æœæ±‚å‡ºçš„ä¸ªæ•°ä¸è¿™æ¡å‘½ä»¤æ‰€è§„å®šçš„ç›¸åŒ
 			if (paramCount == command.paramCount || command.paramCount == -1) {
 				command.parameters = parameters;
 				return command;
@@ -227,13 +227,13 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * È¥invoker¶ÔÏóÖĞÈ¥Ñ°Õâ¸öcommand¶ÔÓ¦µÄ´¦ÀíËüµÄ·½·¨£¨ÒÀ¾İCommandName×¢½â¡¢´¦Àíº¯ÊıµÄ²ÎÊıÀàĞÍ¼°¸öÊı£©
+	 * å»invokerå¯¹è±¡ä¸­å»å¯»è¿™ä¸ªcommandå¯¹åº”çš„å¤„ç†å®ƒçš„æ–¹æ³•ï¼ˆä¾æ®CommandNameæ³¨è§£ã€å¤„ç†å‡½æ•°çš„å‚æ•°ç±»å‹åŠä¸ªæ•°ï¼‰
 	 * @param command
-	 * @return Èç¹û´«ÈëµÄcommand´¦Àí³É¹¦·µ»Øtrue·ñÔò·µ»Øfalse
+	 * @return å¦‚æœä¼ å…¥çš„commandå¤„ç†æˆåŠŸè¿”å›trueå¦åˆ™è¿”å›false
 	 */
 	public boolean handleCommand(Command command) {
         Method method = null;
-		//¶ÔÓÚÒ»²ÎÃüÁîµÄ´¦Àíº¯Êı£¬¿ÉÒÔ¶¨ÒåÎªÎŞ²Îº¯Êı¼ÓOnlyCare×¢½âµÄĞÎÊ½£¬¶ÔÓÚÒ»²ÎÃüÁî£¬ÏÈ³¢ÊÔÑ°ÕÒÎŞ²Î´¦Àíº¯Êı
+		//å¯¹äºä¸€å‚å‘½ä»¤çš„å¤„ç†å‡½æ•°ï¼Œå¯ä»¥å®šä¹‰ä¸ºæ— å‚å‡½æ•°åŠ OnlyCareæ³¨è§£çš„å½¢å¼ï¼Œå¯¹äºä¸€å‚å‘½ä»¤ï¼Œå…ˆå°è¯•å¯»æ‰¾æ— å‚å¤„ç†å‡½æ•°
 		if(command.paramCount == 1) {
 			method = methodsMap.get(command.commandName+"0");
 			if (method != null) {
@@ -242,21 +242,21 @@ public class CommandAnalyzer implements Analysable
 				}
 			}
 		}
-		//Ã»ÓĞµÄ»°ÕÒÓĞÃ»ÓĞ¹Ì¶¨²ÎÊıµÄ´¦ÀíÕâÌõÃüÁîµÄ·½·¨
+		//æ²¡æœ‰çš„è¯æ‰¾æœ‰æ²¡æœ‰å›ºå®šå‚æ•°çš„å¤„ç†è¿™æ¡å‘½ä»¤çš„æ–¹æ³•
 		if(method == null) {
 			method = methodsMap.get(command.commandName+
 					(command.paramCount == -1 ?
 							(command.parameters == null ? 0 : command.parameters.length)
 							: command.paramCount));
 		}
-		//ÔÙÃ»ÓĞµÄ»°£¬ÔÙÕÒ²ÎÊıÎªCommand»òString...µÄ´¦ÀíÕâÌõÃüÁîµÄ·½·¨
+		//å†æ²¡æœ‰çš„è¯ï¼Œå†æ‰¾å‚æ•°ä¸ºCommandæˆ–String...çš„å¤„ç†è¿™æ¡å‘½ä»¤çš„æ–¹æ³•
 		if(method == null) {
 			method = methodsMap.get(command.commandName + "$");
 			if(method == null) return false;
 		}
 		try {
 			int paramCount = method.getParameterCount();
-			//Æ¥Åäµ½µÄ·½·¨Ö»ÓĞÒ»²ÎÇÒÎªCommandÀàĞÍ»òString...ĞÍ
+			//åŒ¹é…åˆ°çš„æ–¹æ³•åªæœ‰ä¸€å‚ä¸”ä¸ºCommandç±»å‹æˆ–String...å‹
 			if(paramCount == 1) {
 				Class<?> type = method.getParameterTypes()[0];
 				if(type == Command.class) 
@@ -271,9 +271,9 @@ public class CommandAnalyzer implements Analysable
 					method.invoke(invoker, toType(command.parameters[0], type));
 				}
 			}
-			//ÎŞ²Î·½·¨
+			//æ— å‚æ–¹æ³•
 			else if (paramCount == 0) {
-				//¶ÔÓÚÎŞ²Îº¯ÊıÒ»²ÎÃüÁîµÄÌØÊâÇé¿ö£¬³¢ÊÔÃô¸Ğ²ÎÊıÀ¹½Ø
+				//å¯¹äºæ— å‚å‡½æ•°ä¸€å‚å‘½ä»¤çš„ç‰¹æ®Šæƒ…å†µï¼Œå°è¯•æ•æ„Ÿå‚æ•°æ‹¦æˆª
 				if (method.isAnnotationPresent(OnlyCare.class)) {
 					OnlyCare onlyCare = method.getAnnotation(OnlyCare.class);
 					if (command.parameters.length == 1 &&
@@ -283,9 +283,9 @@ public class CommandAnalyzer implements Analysable
 				}
 				else method.invoke(invoker);
 			}
-			//¶à²Î£¨°üº¬Ò»²Î£¿£©
+			//å¤šå‚ï¼ˆåŒ…å«ä¸€å‚ï¼Ÿï¼‰
 			else if(paramCount == command.parameters.length){
-				//×öStringµ½¸÷ÖÖ»ù±¾²ÎÊıÀàĞÍµÄ×ª»»£¬°´ÕÕ´¦Àíº¯Êı²ÎÊıÁĞ±íµÄË³ĞòÒ»Ò»×ª»»
+				//åšStringåˆ°å„ç§åŸºæœ¬å‚æ•°ç±»å‹çš„è½¬æ¢ï¼ŒæŒ‰ç…§å¤„ç†å‡½æ•°å‚æ•°åˆ—è¡¨çš„é¡ºåºä¸€ä¸€è½¬æ¢
 				if (!checkIfOnlyCareCanPass(method, command)) return false;
 				Class<?>[] types = method.getParameterTypes();
 				Object[] objects = new Object[types.length];
@@ -302,10 +302,10 @@ public class CommandAnalyzer implements Analysable
 	}
 
 	/**
-	 * ÅĞ¶ÏÕâ¸ömethodÊÇ·ñ´øÓĞOnlyCare×¢½â£¬Èç¹û´øÓĞÔòÅĞ¶ÏÊÇ·ñ·ûºÏOnlyCareµÄÒªÇó
+	 * åˆ¤æ–­è¿™ä¸ªmethodæ˜¯å¦å¸¦æœ‰OnlyCareæ³¨è§£ï¼Œå¦‚æœå¸¦æœ‰åˆ™åˆ¤æ–­æ˜¯å¦ç¬¦åˆOnlyCareçš„è¦æ±‚
 	 * @param command
 	 * @param method
-	 * @return ·ûºÏÒªÇó£¨Í¨¹ıÁË¿ÉÒÔ±»·´Éäµ÷ÓÃ£©·µ»Øtrue
+	 * @return ç¬¦åˆè¦æ±‚ï¼ˆé€šè¿‡äº†å¯ä»¥è¢«åå°„è°ƒç”¨ï¼‰è¿”å›true
 	 */
 	private static boolean checkIfOnlyCareCanPass(Method method, Command command) {
 		Parameter[] parameters = method.getParameters();
@@ -326,8 +326,8 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * ½«Ò»Ìõcommand²åÈëµ½commands¼¯ºÏÖĞ£¬µ«²¢²»¸üĞÂÄ¿Â¼map
-	 * Ò»¶¨²»ÒªÍü¼Ç¸üĞÂÄ¿Â¼£¬·ñÔò»á³öÎÊÌâ
+	 * å°†ä¸€æ¡commandæ’å…¥åˆ°commandsé›†åˆä¸­ï¼Œä½†å¹¶ä¸æ›´æ–°ç›®å½•map
+	 * ä¸€å®šä¸è¦å¿˜è®°æ›´æ–°ç›®å½•ï¼Œå¦åˆ™ä¼šå‡ºé—®é¢˜
 	 * @param command
 	 */
 	private int insertCommand(Command command) {
@@ -340,7 +340,7 @@ public class CommandAnalyzer implements Analysable
 			commandsDirectory.put(key, new int[]{start,1});
 			return start;
 		}else {
-			//ÕÒÎ»ÖÃ²å¶Ó
+			//æ‰¾ä½ç½®æ’é˜Ÿ
 			for(int i=0,len = commands.size();i<len;i++) {
 				if(commands.get(i).commandName.charAt(0) == key) {
 					commands.add(i,command);
@@ -352,11 +352,11 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * ¸üĞÂÃüÁîÄ¿Â¼£¬Ê¹µÃÄ¿Â¼mapÄÜ¹»Õı³£¹¤×÷
+	 * æ›´æ–°å‘½ä»¤ç›®å½•ï¼Œä½¿å¾—ç›®å½•mapèƒ½å¤Ÿæ­£å¸¸å·¥ä½œ
 	 */
 	private void updateCommandsDirectory() {
 		if(commands.size() == 1) return;
-		//¸ù¾İÅÅºÃµÄË³Ğò½¨Á¢Ä¿Â¼
+		//æ ¹æ®æ’å¥½çš„é¡ºåºå»ºç«‹ç›®å½•
 		Iterator<Command> iterator = commands.iterator();
 		Command temp = iterator.next();
 		char lastchar = temp.commandName.charAt(0) , nowchar;
@@ -379,7 +379,7 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * ½«Ò»¸öStringÀàĞÍµÄ²ÎÊıarg½âÎöÎªtypeÀàĞÍ²¢ÒÔObjectÀàĞÍµÄĞÎÊ½·µ»Ø
+	 * å°†ä¸€ä¸ªStringç±»å‹çš„å‚æ•°argè§£æä¸ºtypeç±»å‹å¹¶ä»¥Objectç±»å‹çš„å½¢å¼è¿”å›
 	 * @param arg
 	 * @param type
 	 * @return
@@ -405,7 +405,7 @@ public class CommandAnalyzer implements Analysable
 	}
 
 	/**
-	 * @return ³õÊ¼»¯¹ıµÄÃüÁî¼¯ºÏ
+	 * @return åˆå§‹åŒ–è¿‡çš„å‘½ä»¤é›†åˆ
 	 */
 	@Override
 	public List<Command> getCommands() {
@@ -413,7 +413,7 @@ public class CommandAnalyzer implements Analysable
 	}
 	
 	/**
-	 * Ìí¼ÓÒ»ÌõÃüÁî,»á²éÖØ
+	 * æ·»åŠ ä¸€æ¡å‘½ä»¤,ä¼šæŸ¥é‡
 	 * @param command
 	 */
 	@Override
@@ -446,7 +446,7 @@ public class CommandAnalyzer implements Analysable
 	}
 
 	/**
-	 * @return ËùÓĞµÄÃüÁîµÄÃèÊöÆ´½Ó³ÉÒ»¸östringµÄĞÎÊ½·µ»Ø
+	 * @return æ‰€æœ‰çš„å‘½ä»¤çš„æè¿°æ‹¼æ¥æˆä¸€ä¸ªstringçš„å½¢å¼è¿”å›
 	 */
 	@Override
 	public String getCommandsDescription() {
@@ -474,13 +474,13 @@ public class CommandAnalyzer implements Analysable
 							(command.parameters == null ? 0 : command.parameters.length)
 							: command.paramCount));
 			if(method == null) method = methodsMap.get(command.commandName + "$");
-			//Èç¹û×îÖÕÕÒµ½ÁË
+			//å¦‚æœæœ€ç»ˆæ‰¾åˆ°äº†
 			if(method != null) {
 				builder .append("handlingMethod-->")
 						.append(CmdUtils.getSimpleMethodSignature(method.toGenericString())).append('\n');
 				builder .append("analyzer_id-->").append(getId()).append('\n');
 			}
-			//ÓĞ¿ÉÄÜÕâ¸öcommand¶ÔÓ¦ÁËºÃ¶à¸öhandlingMethod£¬Ò»µãÒ»µãÕÒ°É
+			//æœ‰å¯èƒ½è¿™ä¸ªcommandå¯¹åº”äº†å¥½å¤šä¸ªhandlingMethodï¼Œä¸€ç‚¹ä¸€ç‚¹æ‰¾å§
 			else {
 				Set<Entry<String,Method>> entrySet = methodsMap.entrySet();
 				for (Entry<String, Method> entry : entrySet) {
