@@ -1,30 +1,36 @@
-package com.congxiaoyao.handler;
+package com.cmd.handler;
 
-import com.congxiaoyao.cmd.*;
-import com.congxiaoyao.cmd.CommandWindow.OnSubmitListener;
+import com.cmd.annotations.CommandName;
+import com.cmd.annotations.OnlyCare;
+import com.cmd.annotations.Outline;
+import com.cmd.core.*;
+import com.cmd.extras.CodeAssistant;
+import com.cmd.extras.CommandWindow;
 
 import javax.swing.*;
 
 /**
- * Ö÷ÒªÎªÁË´¦Àí¶ÔCommandWindowµÄ²Ù×÷µÄÃüÁî£¬ÈçÇåÆÁ¡¢ÍË³ö¡¢ÉèÖÃ´°¿Ú´óĞ¡ÌáÊ¾ÓïµÈ
- * Õı³£µÄ»°ÕâĞ©´¦Àíº¯ÊıÓ¦¸ÃñîºÏÔÚCommandWindowËùÔÚµÄÀàÖĞ£¬ÕâÀïÖ÷ÒªÊÇµ±×ö¶Ôcmd¿ò¼ÜÊ¹ÓÃµÄÒ»¸ö¼òµ¥demo
+ * ä¸»è¦ä¸ºäº†å¤„ç†å¯¹CommandWindowçš„æ“ä½œçš„å‘½ä»¤ï¼Œå¦‚æ¸…å±ã€é€€å‡ºã€è®¾ç½®çª—å£å¤§å°æç¤ºè¯­ç­‰
+ * æ­£å¸¸çš„è¯è¿™äº›å¤„ç†å‡½æ•°åº”è¯¥è€¦åˆåœ¨CommandWindowæ‰€åœ¨çš„ç±»ä¸­ï¼Œè¿™é‡Œä¸»è¦æ˜¯å½“åšå¯¹cmdæ¡†æ¶ä½¿ç”¨çš„ä¸€ä¸ªç®€å•demo
  *
- * Ö§³ÖµÄÃüÁîÓĞ
- * '720p'			'ÉèÖÃ´°¿Ú³ß´çÎª720P'
- * 'cls'			'ÇåÆÁ'
- * 'exit'			'ÍË³ö'
- * 'version'		'°æ±¾ºÅ'
- * 'height'	'1'		'ÉèÖÃ´°¿Ú¸ß¶È'
- * 'font'	'1'		'ÉèÖÃ×ÖÌå´óĞ¡'
- * 'close'	'1'		'ÉèÖÃÄÜ·ñÓÃÊó±ê¹Ø±Õ´°¿Ú'
- * 'window'	'1'		'max¡¢full¡¢nobar'
- * 'bound'	'2'		'ÉèÖÃ´°¿Ú¿í¸ß'
- * 'hint'	'1'	'`'	'ÉèÖÃhintÎÄ×Ö'
+ * æ”¯æŒçš„å‘½ä»¤æœ‰
+ * '720p'			'è®¾ç½®çª—å£å°ºå¯¸ä¸º720P'
+ * 'cls'			'æ¸…å±'
+ * 'exit'			'é€€å‡º'
+ * 'version'		'ç‰ˆæœ¬å·'
+ * 'height'			'è®¾ç½®çª—å£é«˜åº¦'
+ * 'font'			'è®¾ç½®å­—ä½“å¤§å°'
+ * 'close'			'è®¾ç½®èƒ½å¦ç”¨é¼ æ ‡å…³é—­çª—å£'
+ * 'window'			'maxã€fullã€nobar'
+ * 'bound'			'è®¾ç½®çª—å£å®½é«˜'
+ * 'hint'			'è®¾ç½®hintæ–‡å­—'
  * 
  * @author congxiaoyao
  * @date 2016.2.2
- * @version 1.2
+ * @version 2.0
  */
+
+@Outline(commandNames = {"window"},outlines = {"è®¾ç½®çª—å£å±æ€§ max full nobar"})
 public class CommandWindowHandler extends BaseHandler {
 	
 	private CommandWindow window;
@@ -41,7 +47,7 @@ public class CommandWindowHandler extends BaseHandler {
 	}
 
 	/**
-	 * CommandName×¢½âÃ»ÓĞÀ¨ºÅÒ²ÊÇ¿ÉÒÔµÄ µ«ĞèÒªÒÔhandle¿ªÍ·
+	 * CommandNameæ³¨è§£æ²¡æœ‰æ‹¬å·ä¹Ÿæ˜¯å¯ä»¥çš„ ä½†éœ€è¦ä»¥handleå¼€å¤´
 	 */
 	@CommandName
 	public void handleExit() {
@@ -50,17 +56,17 @@ public class CommandWindowHandler extends BaseHandler {
 
 	@CommandName
 	public void handleVersion() {
-		System.out.println("v1.2.1");
+		System.out.println("v2.0");
 	}
 
 	@CommandName
 	public void handle720P() {
-		CommandAnalyzerManager.getInstance().process("bound 1280 720");
+		getAnalysable().process("bound 1280 720");
 		getAnalysable().process("font 20");
 	}
 
 	/**
-	 * Õâ¾ÍÊÇËùÎ½µÄ²ÎÊıÀ¹½ØÌØĞÔ£¬À¹½ØµÄÊÇwindowÃüÁîµÄmax²ÎÊı
+	 * è¿™å°±æ˜¯æ‰€è°“çš„å‚æ•°æ‹¦æˆªç‰¹æ€§ï¼Œæ‹¦æˆªçš„æ˜¯windowå‘½ä»¤çš„maxå‚æ•°
 	 */
     @OnlyCare("max")
 	@CommandName("window")
@@ -71,7 +77,7 @@ public class CommandWindowHandler extends BaseHandler {
     @OnlyCare("full")
 	@CommandName("window")
 	public void handleFull() {
-		int size = window.getFontSize();
+        int size = window.getFontSize();
 		window.closeWindow();
 		window = new CommandWindow(true);
 		window.setFontSize(size);
@@ -89,13 +95,8 @@ public class CommandWindowHandler extends BaseHandler {
 		window.setFontSize(size);
 		window.setUndecorated(true);
 		window.setVisible();
-		window.setOnSubmitListener(new OnSubmitListener() {
-			@Override
-			public void onSubmit(String content) {
-				getAnalysable().process(content);
-			}
-		});
-	}
+        window.setOnSubmitListener((content -> getAnalysable().process(content)));
+    }
 
 	@CommandName("cls")
 	public void clearCommandWindow() {
@@ -103,7 +104,7 @@ public class CommandWindowHandler extends BaseHandler {
 	}
 	
 	/**
-	 * Õâ¾ÍÊÇËùÎ½µÄ×Ô¶¯²ÎÊıÀàĞÍ×ª»»£¬¿É½«ÓÃ»§µÄºÏ·¨ÊäÈë×Ô¶¯×ª»»ÎªintĞÍ·½±ãÊ¹ÓÃ
+	 * è¿™å°±æ˜¯æ‰€è°“çš„è‡ªåŠ¨å‚æ•°ç±»å‹è½¬æ¢ï¼Œå¯å°†ç”¨æˆ·çš„åˆæ³•è¾“å…¥è‡ªåŠ¨è½¬æ¢ä¸ºintå‹æ–¹ä¾¿ä½¿ç”¨
 	 * @param height
 	 */
 	@CommandName("height")
@@ -117,17 +118,17 @@ public class CommandWindowHandler extends BaseHandler {
 	}
 	
 	/**
-	 * ²¼¶ûÖµÀàĞÍµÄ²ÎÊıÒ²¿É×Ô¶¯ÀàĞÍ×ª»» µ±ÓÃ»§ÊäÈëtrue/falseÊ±»á×Ô¶¯×ª»»Îª²¼¶ûÀàĞÍ
+	 * å¸ƒå°”å€¼ç±»å‹çš„å‚æ•°ä¹Ÿå¯è‡ªåŠ¨ç±»å‹è½¬æ¢ å½“ç”¨æˆ·è¾“å…¥true/falseæ—¶ä¼šè‡ªåŠ¨è½¬æ¢ä¸ºå¸ƒå°”ç±»å‹
 	 * @param can
 	 */
 	@CommandName("close")
-	public void setWindowDefaultCloseOperation(boolean can) {
+	public void setWindowCloseOperation(boolean can) {
 		if(can) {
 			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			System.out.println("ÉèÖÃ³É¹¦ ¿ÉÍ¨¹ıÊó±ê¹Ø±Õ´°¿Ú");
+			System.out.println("è®¾ç½®æˆåŠŸ å¯é€šè¿‡é¼ æ ‡å…³é—­çª—å£");
 		}else {
 			window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-			System.out.println("ÉèÖÃ³É¹¦ ÒÑ½ûÖ¹Êó±ê¹Ø±Õ´°¿Ú");
+			System.out.println("è®¾ç½®æˆåŠŸ å·²ç¦æ­¢é¼ æ ‡å…³é—­çª—å£");
 		}
 	}
 
@@ -150,26 +151,4 @@ public class CommandWindowHandler extends BaseHandler {
 		}
 	}
 
-	/**
-	 * Èç¹û²»Í¨¹ıÎÄ¼şÅäÖÃÃüÁîµÄ»°£¬Ò²¿ÉÒÔµ÷ÓÃÕâ¸öº¯Êı¶¯Ì¬µÄÌí¼ÓÕâĞ©ÃüÁî
-	 * Õâ¸öº¯ÊıÌí¼ÓµÄËùÓĞÃüÁîµÄ´¦Àí·½·¨ÒÑ¾­±»CommandWindowHandlerÖĞµÄ´¦Àíº¯ÊıÊµÏÖÁË
-     */
-	@Override
-	public BaseHandler registerCommands() {
-		Analysable analysable = getAnalysable();
-		analysable.addCommand(new Command("720p",	"ÉèÖÃ´°¿Ú³ß´çÎª720P"));
-		analysable.addCommand(new Command("cls",	"ÇåÆÁ"));
-		analysable.addCommand(new Command("exit",	"ÍË³ö"));
-		analysable.addCommand(new Command("version","°æ±¾ºÅ"));
-
-		analysable.addCommand(new Command("height",	1,	"ÉèÖÃ´°¿Ú¸ß¶È"));
-		analysable.addCommand(new Command("font",	1,	"ÉèÖÃ×ÖÌå´óĞ¡"));
-		analysable.addCommand(new Command("close",	1,	"ÉèÖÃÄÜ·ñÓÃÊó±ê¹Ø±Õ´°¿Ú"));
-		analysable.addCommand(new Command("window",	1,	"max¡¢full¡¢nobar"));
-
-		analysable.addCommand(new Command("bound",	2,	"ÉèÖÃ´°¿Ú¿í¸ß"));
-
-		analysable.addCommand(new Command("hint",	1,	"`",	"ÉèÖÃhintÎÄ×Ö"));
-		return this;
-	}
 }

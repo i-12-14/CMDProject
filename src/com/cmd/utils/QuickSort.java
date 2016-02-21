@@ -1,12 +1,12 @@
-package com.congxiaoyao.cmd;
+package com.cmd.utils;
 
 /**
- * ¿ìËÙÅÅĞòËã·¨µÄ·â×°Àà(ÊÊÅäÆ÷?) ±¾ÀàÖ»Õë¶ÔÒ»ÖÖÇé¿ö½øĞĞÅÅĞò£¬
- * µ±ÎÒÃÇ×Ô¼ºÊµÏÖÁËÒ»ÖÖÔªËØÈİÆ÷£¨ÏñÊÇArrayList¡¢Vector)µ«²¢Ã»ÓĞÊµÏÖ±ê×¼µÄList½Ó¿ÚÊ±
- * ÏµÍ³ÎŞ·¨ÎªÎÒÃÇÌá¹©ÅÅĞòËã·¨,´ËÀàµÄ×÷ÓÃ¾ÍÊÇÊÊÅäÕâÖÖÈİÆ÷²¢Ìá¹©¿ìËÙÅÅĞòËã·¨
- * ÆäÖĞ·ºĞÍ{@code Container}ÎªÈİÆ÷µÄÀàĞÍ£¬·ºĞÍ{@code Element}ÎªÈİÆ÷ÄÚ°ü¹üµÄÔªËØµÄÀàĞÍ
- * ÇëÏÈÊµÏÖÈı¸öabstract·½·¨ÒÔ±ãÔÚÅÅĞòÊ±¿ÉÒÔ½»»»ÔªËØÎ»ÖÃ¼°È·¶¨ÈİÆ÷´óĞ¡
- * ÈçÓĞÌØÊâĞèÒª»ò¸ü¸ßĞ§µÄÔªËØ½»»»·½·¨¿ÉÒÔ¸²Ğ´{@code QuickSort#swap(int, int, Object)}º¯Êı
+ * å¿«é€Ÿæ’åºç®—æ³•çš„å°è£…ç±»(é€‚é…å™¨?) æœ¬ç±»åªé’ˆå¯¹ä¸€ç§æƒ…å†µè¿›è¡Œæ’åºï¼Œ
+ * å½“æˆ‘ä»¬è‡ªå·±å®ç°äº†ä¸€ç§å…ƒç´ å®¹å™¨ï¼ˆåƒæ˜¯ArrayListã€Vector)ä½†å¹¶æ²¡æœ‰å®ç°æ ‡å‡†çš„Listæ¥å£æ—¶
+ * ç³»ç»Ÿæ— æ³•ä¸ºæˆ‘ä»¬æä¾›æ’åºç®—æ³•,æ­¤ç±»çš„ä½œç”¨å°±æ˜¯é€‚é…è¿™ç§å®¹å™¨å¹¶æä¾›å¿«é€Ÿæ’åºç®—æ³•
+ * å…¶ä¸­æ³›å‹{@code Container}ä¸ºå®¹å™¨çš„ç±»å‹ï¼Œæ³›å‹{@code Element}ä¸ºå®¹å™¨å†…åŒ…è£¹çš„å…ƒç´ çš„ç±»å‹
+ * è¯·å…ˆå®ç°ä¸‰ä¸ªabstractæ–¹æ³•ä»¥ä¾¿åœ¨æ’åºæ—¶å¯ä»¥äº¤æ¢å…ƒç´ ä½ç½®åŠç¡®å®šå®¹å™¨å¤§å°
+ * å¦‚æœ‰ç‰¹æ®Šéœ€è¦æˆ–æ›´é«˜æ•ˆçš„å…ƒç´ äº¤æ¢æ–¹æ³•å¯ä»¥è¦†å†™{@code QuickSort#swap(int, int, Object)}å‡½æ•°
  *
  * Created by congxiaoyao on 2016/2/8.
  * @version 1.0
@@ -14,8 +14,8 @@ package com.congxiaoyao.cmd;
 public abstract class QuickSort<Container , Element> {
 
     /**
-     * ÅÅĞòÈë¿Úº¯Êı£¬Í¨¹ı¿ìÅÅÊµÏÖÅÅĞò
-     * @param container ÈİÆ÷£¬¿ÉÒÔÀí½âÎª´øÅÅĞòÊı×é
+     * æ’åºå…¥å£å‡½æ•°ï¼Œé€šè¿‡å¿«æ’å®ç°æ’åº
+     * @param container å®¹å™¨ï¼Œå¯ä»¥ç†è§£ä¸ºå¸¦æ’åºæ•°ç»„
      */
     public void sort(Container container) {
         if (container != null) {
@@ -24,10 +24,10 @@ public abstract class QuickSort<Container , Element> {
     }
 
     /**
-     * µİ¹é°æ¿ìÅÅ£¬¶ÔcontainerÖĞµÄÔªËØ½øĞĞÅÅĞò
-     * @param start ¿ªÊ¼ÅÅĞòµÄ·¶Î§
-     * @param end   ½áÊøÅÅĞòµÄ·¶Î§
-     * @param container ÈİÆ÷£¬¿ÉÒÔÀí½âÎª´ıÅÅĞòÊı×é
+     * é€’å½’ç‰ˆå¿«æ’ï¼Œå¯¹containerä¸­çš„å…ƒç´ è¿›è¡Œæ’åº
+     * @param start å¼€å§‹æ’åºçš„èŒƒå›´
+     * @param end   ç»“æŸæ’åºçš„èŒƒå›´
+     * @param container å®¹å™¨ï¼Œå¯ä»¥ç†è§£ä¸ºå¾…æ’åºæ•°ç»„
      */
     private void quickSort(int start, int end, Container container) {
         if (start >= end) return;
@@ -54,7 +54,7 @@ public abstract class QuickSort<Container , Element> {
     }
 
     /**
-     * ½»»»containerÖĞµÄÎ»ÓÚindex0¼°index1µÄÁ½¸öÔªËØ
+     * äº¤æ¢containerä¸­çš„ä½äºindex0åŠindex1çš„ä¸¤ä¸ªå…ƒç´ 
      * @param index0
      * @param index1
      * @param container
@@ -66,22 +66,22 @@ public abstract class QuickSort<Container , Element> {
     }
 
     /**
-     * Èç¹ûÏ£ÍûQuickSort´ÓĞ¡µ½´óÅÅĞò£¬ÇëÓÃ element0-element1£¬·ñÔòÓÃ element1-element0
+     * å¦‚æœå¸Œæœ›QuickSortä»å°åˆ°å¤§æ’åºï¼Œè¯·ç”¨ element0-element1ï¼Œå¦åˆ™ç”¨ element1-element0
      * @param element0
      * @param element1
-     * @return element0 ´óÓÚ element1 Òª·µ»ØÕıÊı element0 Ğ¡ÓÚ element1 Òª·µ»Ø¸ºÊı ÏàµÈ·µ»Ø0
+     * @return element0 å¤§äº element1 è¦è¿”å›æ­£æ•° element0 å°äº element1 è¦è¿”å›è´Ÿæ•° ç›¸ç­‰è¿”å›0
      */
     public abstract int compare(Element element0, Element element1);
 
     /**
      * @param container
      * @param index
-     * @return containerÖĞÎ»ÓÚindexµÄÔªËØ
+     * @return containerä¸­ä½äºindexçš„å…ƒç´ 
      */
     public abstract Element get(Container container, int index);
 
     /**
-     * ¸øcontainerµÄindexÎ»ÖÃ¸³Öµ
+     * ç»™containerçš„indexä½ç½®èµ‹å€¼
      * @param container
      * @param element
      * @param index
@@ -90,7 +90,7 @@ public abstract class QuickSort<Container , Element> {
 
     /**
      * @param container
-     * @return containerµÄ´óĞ¡£¬Ò²¿ÉÒÔÀí½âÎªÏëÒªÅÅĞòµÄ²¿·ÖµÄ³¤¶È
+     * @return containerçš„å¤§å°ï¼Œä¹Ÿå¯ä»¥ç†è§£ä¸ºæƒ³è¦æ’åºçš„éƒ¨åˆ†çš„é•¿åº¦
      */
     public abstract int size(Container container);
 }

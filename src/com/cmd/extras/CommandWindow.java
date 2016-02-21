@@ -1,4 +1,4 @@
-package com.congxiaoyao.cmd;
+package com.cmd.extras;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -15,17 +15,19 @@ import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 
-import com.congxiaoyao.cmd.CodeAssistant.WeightedString;
+import com.cmd.utils.RoundList;
+import com.cmd.utils.SelectableArray;
+import com.cmd.extras.CodeAssistant.WeightedString;
 
 /**
- * ÓÃJTextAreaĞ´³ÉµÄ·ÂwindowsµÄCMD´°¿Ú£¬×÷ÎªCMD¿ò¼ÜµÄÒ»²¿·Ö£¬Ö÷Òª¸ºÔğUI·½ÃæµÄÄÚÈİ
- * µ÷ÓÃÎŞ²ÎµÄ¹¹Ôìº¯ÊıÊµÀı»¯ºó£¬Ê¹ÓÃ{@code CommandWindow#setVisible()}·½·¨ÏÔÊ¾ ¹Ø±Õ´°¿ÚÇéµ÷ÓÃ{@code closeWindow}·½·¨
- * ÓÃ»§ÊäÈëµÄÃ¿Ò»ĞĞºÏ·¨ÄÚÈİ¶¼»áÒÔ»Øµ÷½Ó¿ÚµÄĞÎÊ½Í¨ÖªÍâ½ç
+ * ç”¨JTextAreaå†™æˆçš„ä»¿windowsçš„CMDçª—å£ï¼Œä½œä¸ºCMDæ¡†æ¶çš„ä¸€éƒ¨åˆ†ï¼Œä¸»è¦è´Ÿè´£UIæ–¹é¢çš„å†…å®¹
+ * è°ƒç”¨æ— å‚çš„æ„é€ å‡½æ•°å®ä¾‹åŒ–åï¼Œä½¿ç”¨{@code CommandWindow#setVisible()}æ–¹æ³•æ˜¾ç¤º å…³é—­çª—å£æƒ…è°ƒç”¨{@code closeWindow}æ–¹æ³•
+ * ç”¨æˆ·è¾“å…¥çš„æ¯ä¸€è¡Œåˆæ³•å†…å®¹éƒ½ä¼šä»¥å›è°ƒæ¥å£çš„å½¢å¼é€šçŸ¥å¤–ç•Œ
  * {@code OnSubmitListener#onSubmit(String)}
- * Ö§³Ö´úÂëÌáÊ¾¹¦ÄÜ£¬Ä¬ÈÏ²»¿ªÆô£¬ÈçĞèÆôÓÃÇë¹¹Ôì{@code CodeAssistant}ÊµÀı²¢´«Èë
+ * æ”¯æŒä»£ç æç¤ºåŠŸèƒ½ï¼Œé»˜è®¤ä¸å¼€å¯ï¼Œå¦‚éœ€å¯ç”¨è¯·æ„é€ {@code CodeAssistant}å®ä¾‹å¹¶ä¼ å…¥
  * {@code #setAssistant(CodeAssistant)}
- * °´×¡ctrl+ÉÏÏÂ¼ıÍ·¿É²é¿´Ö®Ç°ÊäÈë¹ıµÄÄÚÈİ
- * ÆäËûĞ¡¹¦ÄÜÇë¿´ÀàÄÚ¹²ÓĞ·½·¨µÄ·½·¨×¢ÊÍ
+ * æŒ‰ä½ctrl+ä¸Šä¸‹ç®­å¤´å¯æŸ¥çœ‹ä¹‹å‰è¾“å…¥è¿‡çš„å†…å®¹
+ * å…¶ä»–å°åŠŸèƒ½è¯·çœ‹ç±»å†…å…±æœ‰æ–¹æ³•çš„æ–¹æ³•æ³¨é‡Š
  *
  * @see OnSubmitListener#onSubmit(String)
  * @see #setAssistant(CodeAssistant)
@@ -44,13 +46,13 @@ public class CommandWindow extends JFrame{
 	public static final KeyStroke ARROW_UP = KeyStroke.getKeyStroke(KeyEvent.VK_UP,KeyEvent.CTRL_MASK);
 	public static final KeyStroke ARROW_DOWN = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,KeyEvent.CTRL_MASK);
 	
-	public String HINT = "ÇëÊäÈë>";
-	public String LFHINT = "\nÇëÊäÈë>";
+	public String HINT = "è¯·è¾“å…¥>";
+	public String LFHINT = "\nè¯·è¾“å…¥>";
 	public int    LEN_HINT = HINT.length();
 
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
-	private Font font = new Font("ºÚÌå", Font.BOLD, 15);
+	private Font font = new Font("é»‘ä½“", Font.BOLD, 15);
 
 	private PrintStream printStream;
 	
@@ -62,7 +64,7 @@ public class CommandWindow extends JFrame{
 	private OnSubmitListener onSubmitListener;
 
 	public CommandWindow(int width , int height) {
-		super("ÇëÊäÈëÃüÁî");
+		super("è¯·è¾“å…¥å‘½ä»¤");
 
 		initPrintStream();
 
@@ -93,7 +95,7 @@ public class CommandWindow extends JFrame{
 	}
 
 	/**
-	 * ½«Êä³öÁ÷ÖØ¶¨ÏòµÄCommandWindowÀï£¬Ö»ÓĞËÄ¸öprint·½·¨
+	 * å°†è¾“å‡ºæµé‡å®šå‘çš„CommandWindowé‡Œï¼Œåªæœ‰å››ä¸ªprintæ–¹æ³•
 	 */
 	private void initPrintStream() {
 		printStream = new PrintStream(System.out){
@@ -121,7 +123,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * @return ¹â±êÎ»ÖÃ
+	 * @return å…‰æ ‡ä½ç½®
 	 */
 	private int getCaretPosition() {
 		return textArea.getCaretPosition();
@@ -139,28 +141,28 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * ½«¹â±êÒÆÖÁ×îµÍ¶Ë
+	 * å°†å…‰æ ‡ç§»è‡³æœ€ä½ç«¯
 	 */
 	private void moveCaretToBottom() {
 		textArea.setCaretPosition(getTextLength());
 	}
 	
 	/**
-	 * @return µ±Ç°ÄÚÈİµÄ³¤¶È
+	 * @return å½“å‰å†…å®¹çš„é•¿åº¦
 	 */
 	private int getTextLength() {
 		return textArea.getDocument().getLength();
 	}
 	
 	/**
-	 * @return ¹â±êÔÚ×îºóÒ»¸ö×Ö·ûºóÃæ·µ»Øtrue ·ñÔòfalse
+	 * @return å…‰æ ‡åœ¨æœ€åä¸€ä¸ªå­—ç¬¦åé¢è¿”å›true å¦åˆ™false
 	 */
 	private boolean isCaretAtBottom() {
 		return getTextLength() == getCaretPosition();
 	}
 	
 	/**
-	 * @return Èç¹ûÑ¡ÔñµÄ²¿·ÖÎ»ÓÚ¿É±à¼­Çø·µ»Øtrue
+	 * @return å¦‚æœé€‰æ‹©çš„éƒ¨åˆ†ä½äºå¯ç¼–è¾‘åŒºè¿”å›true
 	 */
 	private boolean isSelectLegal() {
 		Caret caret = textArea.getCaret();
@@ -169,7 +171,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * @return Èç¹û´¦ÓÚÑ¡Ôñ×´Ì¬·µ»Øtrue
+	 * @return å¦‚æœå¤„äºé€‰æ‹©çŠ¶æ€è¿”å›true
 	 */
 	private boolean isSelecting() {
 		Caret caret = textArea.getCaret();
@@ -177,16 +179,16 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * @return ¹â±êµ½ÌáÊ¾·ûµÄ×îºóÒ»¸ö×Ö·ûµÄ¾àÀë£¬Èç£º
-	 * ÇëÊäÈë>abc|de
-	 * |´ú±í¹â±ê£¬´ËÊ±·µ»Ø3
+	 * @return å…‰æ ‡åˆ°æç¤ºç¬¦çš„æœ€åä¸€ä¸ªå­—ç¬¦çš„è·ç¦»ï¼Œå¦‚ï¼š
+	 * è¯·è¾“å…¥>abc|de
+	 * |ä»£è¡¨å…‰æ ‡ï¼Œæ­¤æ—¶è¿”å›3
 	 */
 	private int distanceBetweenCaretAndHint() {
 		return getCaretPosition() - getHintPosition();
 	}
 	
 	/**
-	 * @return textAreaÖĞ×îºóÒ»ĞĞµÄÄÚÈİ
+	 * @return textAreaä¸­æœ€åä¸€è¡Œçš„å†…å®¹
 	 */
 	private String getLastLine() {
 		try {
@@ -199,7 +201,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * @return ÓÃ»§ÔÚ×îºóÒ»ĞĞµÄÊäÈë
+	 * @return ç”¨æˆ·åœ¨æœ€åä¸€è¡Œçš„è¾“å…¥
 	 */
 	private String getLastInput(String lastLine) {
 		if(lastLine == null) {
@@ -210,7 +212,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * Ìæ»»µôÓÃ»§ÊäÈëµÄ²¿·ÖÎªcontent£¬Ò²¾ÍÊÇ×îºóÒ»ĞĞµÄÄÚÈİ£¨²»°üº¬hint£©
+	 * æ›¿æ¢æ‰ç”¨æˆ·è¾“å…¥çš„éƒ¨åˆ†ä¸ºcontentï¼Œä¹Ÿå°±æ˜¯æœ€åä¸€è¡Œçš„å†…å®¹ï¼ˆä¸åŒ…å«hintï¼‰
 	 * @param content
 	 */
 	private void replaceInputing(String content) {
@@ -225,15 +227,15 @@ public class CommandWindow extends JFrame{
 	}
 
 	/**
-	 * ÉèÖÃ¿ØÖÆÌ¨¸ß¶È
-	 * @param height ¸ß¶ÈµÄÏñËØÖµ
+	 * è®¾ç½®æ§åˆ¶å°é«˜åº¦
+	 * @param height é«˜åº¦çš„åƒç´ å€¼
 	 */
 	public void setCommandHeight(int height) {
 		setBounds(getWidth(), height);
 	}
 	
 	/**
-	 * ¹Ø±Õ´°¿Ú
+	 * å…³é—­çª—å£
 	 */
 	public void closeWindow() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -241,23 +243,23 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * Çå³ı´°¿ÚÖĞµÄÄÚÈİ
+	 * æ¸…é™¤çª—å£ä¸­çš„å†…å®¹
 	 */
 	public void clearCommandWindow() {
 		textArea.setText("");
 	}
 	
 	/**
-	 * ÉèÖÃ×ÖÌå´óĞ¡
+	 * è®¾ç½®å­—ä½“å¤§å°
 	 * @param size
 	 */
 	public void setFontSize(int size) {
-		this.font = new Font("ËÎÌå", Font.TYPE1_FONT, size);
+		this.font = new Font("å®‹ä½“", Font.TYPE1_FONT, size);
 		textArea.setFont(font);
 	}
 	
 	/**
-	 * ÉèÖÃÌáÊ¾·ûÏÔÊ¾µÄÄÚÈİ
+	 * è®¾ç½®æç¤ºç¬¦æ˜¾ç¤ºçš„å†…å®¹
 	 * @param hint
 	 */
 	public void setHint(String hint) {
@@ -267,7 +269,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * ÏÔÊ¾´°¿Ú
+	 * æ˜¾ç¤ºçª—å£
 	 * @return
 	 */
 	public CommandWindow setVisible() {
@@ -276,9 +278,9 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * ÉèÖÃÒ»¸ö´°¿ÚµÄ´óĞ¡²¢ÈÃÆä¾ÓÖĞÏÔÊ¾
-	 * @param width frame¿í¶È
-	 * @param height frame¸ß¶È
+	 * è®¾ç½®ä¸€ä¸ªçª—å£çš„å¤§å°å¹¶è®©å…¶å±…ä¸­æ˜¾ç¤º
+	 * @param width frameå®½åº¦
+	 * @param height frameé«˜åº¦
 	 */
 	public void setBounds(int width ,int height)
 	{
@@ -288,7 +290,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * ²»ÖØ¶¨ÏòÊä³öÁ÷£¬ÈÃsysoutÖØ»Ø¿ØÖÆÌ¨
+	 * ä¸é‡å®šå‘è¾“å‡ºæµï¼Œè®©sysouté‡å›æ§åˆ¶å°
 	 */
 	public void resetPrintStream() {
 		printStream = new PrintStream(System.out);
@@ -296,7 +298,7 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * ÔÚ´°¿ÚÖĞÊä³östringµÄÖµ,Èç¹ûÔÚstringµÄ½áÎ²Óöµ½\4£¬ÔòÈÏÎªĞèÒªÔÚÏÂÒ»ĞĞÊä³öHINT
+	 * åœ¨çª—å£ä¸­è¾“å‡ºstringçš„å€¼,å¦‚æœåœ¨stringçš„ç»“å°¾é‡åˆ°\4ï¼Œåˆ™è®¤ä¸ºéœ€è¦åœ¨ä¸‹ä¸€è¡Œè¾“å‡ºHINT
 	 * @param string
 	 */
 	public void println(String string){
@@ -315,8 +317,8 @@ public class CommandWindow extends JFrame{
 	}
 	
 	/**
-	 * ÔÚ´°¿ÚÖĞÊä³östringµÄÖµ,µ«²»ÊÇÒ»ÏÂ×Ó±Ä³öÀ´£¬ÊÇ»ºÂıµÄ³öÀ´µÄ£¬Ç£³¶µ½¶àÏß³ÌÎÊÌâ£¬ÇëÉ÷ÓÃ
-	 * Çë¾¡Á¿ÔÚ´¦Àíº¯ÊıÖĞÊ¹ÓÃ´Ëº¯Êı£¬·ñÔò¿ÉÄÜÔì³ÉÊı¾İÏÔÊ¾²»ÍêÕû
+	 * åœ¨çª—å£ä¸­è¾“å‡ºstringçš„å€¼,ä½†ä¸æ˜¯ä¸€ä¸‹å­è¹¦å‡ºæ¥ï¼Œæ˜¯ç¼“æ…¢çš„å‡ºæ¥çš„ï¼Œç‰µæ‰¯åˆ°å¤šçº¿ç¨‹é—®é¢˜ï¼Œè¯·æ…ç”¨
+	 * è¯·å°½é‡åœ¨å¤„ç†å‡½æ•°ä¸­ä½¿ç”¨æ­¤å‡½æ•°ï¼Œå¦åˆ™å¯èƒ½é€ æˆæ•°æ®æ˜¾ç¤ºä¸å®Œæ•´
 	 * @param string
 	 */
 	private boolean can = true;
@@ -378,14 +380,14 @@ public class CommandWindow extends JFrame{
 		}
 
 		/**
-		 * ÖØĞ´ÁËprocessKeyBinding·½·¨£¬À¹½ØÁË»Ø³µ¡¢ÍË¸ñ¡¢Õ³Ìù¡¢¿É¼û×ÖÄ¸·ûºÅ²¢ÖØĞÂ¼ÓÒÔ´¦Àí
-		 * ÏŞÖÆÁË¶ÔtextAreaµÄÒ»²¿·Ö²Ù×÷£¬Ê¹µÃËû±íÏÖµÄÏñÊÇÕæµÄCMDÒ»Ñù
-		 * returnÄÇÀïÒ²ÊÇËæ±ãreturnµÄ£¬true»òfalseÎŞËùÎ½ÁË
+		 * é‡å†™äº†processKeyBindingæ–¹æ³•ï¼Œæ‹¦æˆªäº†å›è½¦ã€é€€æ ¼ã€ç²˜è´´ã€å¯è§å­—æ¯ç¬¦å·å¹¶é‡æ–°åŠ ä»¥å¤„ç†
+		 * é™åˆ¶äº†å¯¹textAreaçš„ä¸€éƒ¨åˆ†æ“ä½œï¼Œä½¿å¾—ä»–è¡¨ç°çš„åƒæ˜¯çœŸçš„CMDä¸€æ ·
+		 * returné‚£é‡Œä¹Ÿæ˜¯éšä¾¿returnçš„ï¼Œtrueæˆ–falseæ— æ‰€è°“äº†
 		 */
 		@Override
 		protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
 			if(condition != 0) return false;
-			//ÏÈ¼ì²é×îºóÒ»ĞĞµÄÌáÊ¾·ûÊÇ·ñ´æÔÚ
+			//å…ˆæ£€æŸ¥æœ€åä¸€è¡Œçš„æç¤ºç¬¦æ˜¯å¦å­˜åœ¨
 			String lastLine = getLastLine();
 			if(lastLine.length() < HINT.length() && can) {
 				textArea.append(HINT);
@@ -393,7 +395,7 @@ public class CommandWindow extends JFrame{
 				if(ks.equals(ENTER)) return false;
 				return processKeyBinding(ks, e, condition, pressed);
 			}
-			//À¹½Øctrl+ÉÏ¼ıÍ·¡¢ÏÂ¼ıÍ·
+			//æ‹¦æˆªctrl+ä¸Šç®­å¤´ã€ä¸‹ç®­å¤´
 			if(ks.equals(ARROW_UP)) {
 				if(inputs.size() > 0) {
 					replaceInputing(inputs.getAllowsNegativeIndex(--inputsPointer));
@@ -405,9 +407,9 @@ public class CommandWindow extends JFrame{
 					moveCaretToBottom();
 				}
 			}
-			//À¹½Ø»Ø³µ
+			//æ‹¦æˆªå›è½¦
 			if(ks.equals(ENTER)) {
-				//Èç¹û´¦ÓÚ´úÂëÌáÊ¾×´Ì¬
+				//å¦‚æœå¤„äºä»£ç æç¤ºçŠ¶æ€
 				if(isSelecting() && assistant !=null) {
 					int len = getTextLength();
 					select(len, len);
@@ -418,7 +420,7 @@ public class CommandWindow extends JFrame{
 					moveCaretToBottom();
 					return processKeyBinding(ks, e, condition, pressed);
 				}
-				//ÌáÈ¡ÓÃ»§ÊäÈë
+				//æå–ç”¨æˆ·è¾“å…¥
 				String content = getLastInput(lastLine);
 				if(!content.equals("") && onSubmitListener != null){
 					textArea.append("\n");
@@ -437,7 +439,7 @@ public class CommandWindow extends JFrame{
 				moveCaretToBottom();
 				return false;
 			}
-			//À¹½ØÍË¸ñ
+			//æ‹¦æˆªé€€æ ¼
 			else if (ks.equals(BACK)) {
 				if(isSelecting()) {
 					if(isSelectLegal()) 
@@ -450,7 +452,7 @@ public class CommandWindow extends JFrame{
 				moveCaretToBottom();
 				return false;
 			}
-			//À¹½ØÕ³Ìù
+			//æ‹¦æˆªç²˜è´´
 			else if(ks.equals(PASTE)){
 				if(!isSelectLegal()) {
 					moveCaretToBottom();
@@ -458,13 +460,13 @@ public class CommandWindow extends JFrame{
 				}
 				return super.processKeyBinding(ks, e, condition, pressed);
 			}
-			//À¹½Ø¼ôÇĞ
+			//æ‹¦æˆªå‰ªåˆ‡
 			else if(ks.equals(CUT)) {
 				if(isSelectLegal())
 					return super.processKeyBinding(ks, e, condition, pressed);
 		        return false;
 			}
-			//·ÀÖ¹ÄÚÈİÔÚ²»ÕıÈ·µÄµØ·½ÊäÈë
+			//é˜²æ­¢å†…å®¹åœ¨ä¸æ­£ç¡®çš„åœ°æ–¹è¾“å…¥
 			else if(ks.getKeyChar() > 31 && ks.getKeyChar() < 127){
 				if(!isSelectLegal()) {
 					moveCaretToBottom();
@@ -475,10 +477,10 @@ public class CommandWindow extends JFrame{
 		}
 
 		/**
-		 * ´¦Àí´úÂëÌáÊ¾£¬Í¨¹ıÀàÄÚµÄCodeAssistantÀ´²éÕÒÏàÓ¦´úÂë²¢ÏÔÊ¾ÔÚcommandWindowÄÚ
+		 * å¤„ç†ä»£ç æç¤ºï¼Œé€šè¿‡ç±»å†…çš„CodeAssistantæ¥æŸ¥æ‰¾ç›¸åº”ä»£ç å¹¶æ˜¾ç¤ºåœ¨commandWindowå†…
 		 * @param ks
 		 * @param e
-         * @return Èç¹ûÀ¹½ØÁË¿Õ¸ñ»òÌáÊ¾ÁË´úÂëµÄ»°·µ»Øtrue£¬·ñÔò·µ»Øfalse
+         * @return å¦‚æœæ‹¦æˆªäº†ç©ºæ ¼æˆ–æç¤ºäº†ä»£ç çš„è¯è¿”å›trueï¼Œå¦åˆ™è¿”å›false
          */
 		public boolean handleCodeCompletion(KeyStroke ks , KeyEvent e) {
 			if (assistant == null) return false;
@@ -519,8 +521,8 @@ public class CommandWindow extends JFrame{
 	}
 
 	/**
-	 * ÓÃ»§ÊäÈëµÄÄÚÈİ»áÍ¨¹ı´Ë½Ó¿Ú»Øµ÷£¬½«Ã¿Ò»´ÎÓÃ»§µÄÒ»ĞĞÊäÈë×÷Îªº¯ÊıµÄ²ÎÊıÍ¨ÖªÍâ½ç
-	 * @author congxiaoyao
+	 * ç”¨æˆ·è¾“å…¥çš„å†…å®¹ä¼šé€šè¿‡æ­¤æ¥å£å›è°ƒï¼Œå°†æ¯ä¸€æ¬¡ç”¨æˆ·çš„ä¸€è¡Œè¾“å…¥ä½œä¸ºå‡½æ•°çš„å‚æ•°é€šçŸ¥å¤–ç•Œ
+	 * @author core
 	 *
 	 */
 	public interface OnSubmitListener{

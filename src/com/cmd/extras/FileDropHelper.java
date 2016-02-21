@@ -1,4 +1,4 @@
-package com.congxiaoyao.cmd;
+package com.cmd.extras;
 
 import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * ÎÄ¼şÍÏ×§¼àÌı£¬¿ÉÓëCommandWindow°ó¶¨£¬½«»á¼àÌıÍÏÈëCommandWindowµÄÎÄ¼ş
- * ²¢½«ÎÄ¼şÍ¨¹ı{@code onFileDrop}º¯ÊıÍ¨ÖªÍâ½ç
- * °ó¶¨Ê±×¢Òâ²ÎÊıComponent²ÎÊı´«CommandWindowµÄTextArea
+ * æ–‡ä»¶æ‹–æ‹½ç›‘å¬ï¼Œå¯ä¸CommandWindowç»‘å®šï¼Œå°†ä¼šç›‘å¬æ‹–å…¥CommandWindowçš„æ–‡ä»¶
+ * å¹¶å°†æ–‡ä»¶é€šè¿‡{@code onFileDrop}å‡½æ•°é€šçŸ¥å¤–ç•Œ
+ * ç»‘å®šæ—¶æ³¨æ„å‚æ•°Componentå‚æ•°ä¼ CommandWindowçš„TextArea
  *
  * @version 1.0
  * @author congxiaoyao
@@ -33,7 +33,7 @@ public class FileDropHelper {
 						@SuppressWarnings("unchecked")
 						List<File> list = (List<File>) (dtde.getTransferable()
 								.getTransferData(DataFlavor.javaFileListFlavor));
-						//Ö»Ö§³ÖÒ»´ÎÍÏÈëÒ»¸öÎÄ¼ş
+						//åªæ”¯æŒä¸€æ¬¡æ‹–å…¥ä¸€ä¸ªæ–‡ä»¶
 						File file = (File) list.get(0);
 						onFileDrop(file);
 					}

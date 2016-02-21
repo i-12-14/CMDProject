@@ -1,16 +1,21 @@
-package com.congxiaoyao.cmd;
+package com.cmd.extras;
+
+import com.cmd.core.Command;
+import com.cmd.utils.QuickSort;
+import com.cmd.utils.SelectableArray;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * ´úÂëÌáÊ¾Æ÷£¬¹¦ÄÜ¼òÂª£¬¿ÉÓĞ¿ÉÎŞ
- * µ«×÷ÎªÕâÌ×¿ò¼ÜµÄÒ»²¿·Ö£¬Ï£ÍûÄÜÎªÊ¹ÓÃÕßÌá¹©Ò»¸ö¼òµ¥µÄ´úÂëÌáÊ¾µÄ¹¤¾ßÀàÀ´Ó¦¼±
- * ÎÒÃÇ¼ÙÉè±¾ÀàÊÇÅäºÏCommandAnalyzerÒ»Í¬Ê¹ÓÃ£¬ÄÇÖ»ĞèÒª½«CommandAnalyzerÄÚÎ¬»¤µÄCommandµÄList´«Èë¹¹Ôìº¯Êı¼´¿É¹¹Ôì¶ÔÏó
- * Ö®ºóµ÷ÓÃ{@code CodeAssistant#find(String)}·½·¨´«ÈëÓÃ»§µÄµ±Ç°ÊäÈë¼´¿ÉµÃµ½´úÂëÌáÊ¾µÄ½á¹û
- * ½á¹ûÊÇÒÔ{@code SelectableArray<WeightedString>}µÄĞÎÊ½·µ»Ø£¬SelectableArrayÖ§³Öforeach±éÀú»ñÈ¡ÄÚÈİ
- * WeightedStringÖĞËùÓĞ×Ö¶Î¶¼ÊÇpublic·ÃÎÊÈ¨ÏŞµÄ£¬Æästring×Ö¶Î´ú±íÁËËùÎ½µÄCommandName
- * ÁË½âÏêÇéÇë²é¿´WeightedStringµÄÀàÍ·×¢ÊÍ
+ * ä»£ç æç¤ºå™¨ï¼ŒåŠŸèƒ½ç®€é™‹ï¼Œå¯æœ‰å¯æ— 
+ * ä½†ä½œä¸ºè¿™å¥—æ¡†æ¶çš„ä¸€éƒ¨åˆ†ï¼Œå¸Œæœ›èƒ½ä¸ºä½¿ç”¨è€…æä¾›ä¸€ä¸ªç®€å•çš„ä»£ç æç¤ºçš„å·¥å…·ç±»æ¥åº”æ€¥
+ * æˆ‘ä»¬å‡è®¾æœ¬ç±»æ˜¯é…åˆCommandAnalyzerä¸€åŒä½¿ç”¨ï¼Œé‚£åªéœ€è¦å°†CommandAnalyzerå†…ç»´æŠ¤çš„Commandçš„Listä¼ å…¥æ„é€ å‡½æ•°å³å¯æ„é€ å¯¹è±¡
+ * ä¹‹åè°ƒç”¨{@code CodeAssistant#find(String)}æ–¹æ³•ä¼ å…¥ç”¨æˆ·çš„å½“å‰è¾“å…¥å³å¯å¾—åˆ°ä»£ç æç¤ºçš„ç»“æœ
+ * ç»“æœæ˜¯ä»¥{@code SelectableArray<WeightedString>}çš„å½¢å¼è¿”å›ï¼ŒSelectableArrayæ”¯æŒforeachéå†è·å–å†…å®¹
+ * WeightedStringä¸­æ‰€æœ‰å­—æ®µéƒ½æ˜¯publicè®¿é—®æƒé™çš„ï¼Œå…¶stringå­—æ®µä»£è¡¨äº†æ‰€è°“çš„CommandName
+ * äº†è§£è¯¦æƒ…è¯·æŸ¥çœ‹WeightedStringçš„ç±»å¤´æ³¨é‡Š
+ *
  * Created by congxiaoyao on 2015/12/20.
  * @version 1.1
  */
@@ -36,7 +41,7 @@ public class CodeAssistant {
     }
 
 	/**
-	 * @return ³õÊ¼»¯QucikQort
+	 * @return åˆå§‹åŒ–QucikQort
 	 */
 	private QuickSort<SelectableArray<WeightedString>, WeightedString> initQuickSort() {
 		return new QuickSort<SelectableArray<WeightedString>, CodeAssistant.WeightedString>() {
@@ -63,14 +68,14 @@ public class CodeAssistant {
 		};
 	}
     /**
-     * ½«ÓÃ»§ÊäÈë´«Èë¼´¿ÉµÃµ½·ûºÏ²éÕÒ±ê×¼µÄÆ¥Åä¶È´Ó¸ßµ½µÍµÄ²éÕÒ½á¹û
+     * å°†ç”¨æˆ·è¾“å…¥ä¼ å…¥å³å¯å¾—åˆ°ç¬¦åˆæŸ¥æ‰¾æ ‡å‡†çš„åŒ¹é…åº¦ä»é«˜åˆ°ä½çš„æŸ¥æ‰¾ç»“æœ
      * @param content 
-     * @return Ïê¼ûSelectableArrayÀàÍ·×¢ÊÍ¼°WeightedStringÀàÍ·×¢ÊÍ
+     * @return è¯¦è§SelectableArrayç±»å¤´æ³¨é‡ŠåŠWeightedStringç±»å¤´æ³¨é‡Š
      */
     public SelectableArray<WeightedString> find(String content) {
-        //Ã»ÓĞÊµ¼ÊÄÚÈİ
+        //æ²¡æœ‰å®é™…å†…å®¹
         if(content == null || content.length() == 0) return seletableArray;
-        //Ö»ÊÇÔÚÉÏÒ»´ÎµÄ»ù´¡ÉÏ¶à¼ÓÈëÁËÒ»Ğ©ÄÚÈİ£¬ÉÏÒ»´ÎµÄËÑË÷½á¹û¶ÔÓÚÕâÒ»´ÎËÑË÷ÓĞ°ïÖú
+        //åªæ˜¯åœ¨ä¸Šä¸€æ¬¡çš„åŸºç¡€ä¸Šå¤šåŠ å…¥äº†ä¸€äº›å†…å®¹ï¼Œä¸Šä¸€æ¬¡çš„æœç´¢ç»“æœå¯¹äºè¿™ä¸€æ¬¡æœç´¢æœ‰å¸®åŠ©
         if (lastContent != null && content.length() >= lastContent.length()
                 && content.indexOf(lastContent) == 0) {
             seletableArray.refactor();
@@ -78,7 +83,7 @@ public class CodeAssistant {
             seletableArray.reset();
         }
         lastContent = content;
-        //ËÑË÷·ûºÏÌõ¼şµÄcode
+        //æœç´¢ç¬¦åˆæ¡ä»¶çš„code
         char[] chars = content.toCharArray();
         SelectableArray<WeightedString>.ElementPool<WeightedString> pool = seletableArray.getElementPool();
         for (int i = 0, len = pool.size(); i < len; i++) {
@@ -87,7 +92,7 @@ public class CodeAssistant {
                 seletableArray.select(i);
             }
         }
-        //¼ÆËãÏà¹Ø¶È
+        //è®¡ç®—ç›¸å…³åº¦
         char[] contentChars = content.toCharArray();
         for (WeightedString  ws: seletableArray) {
             ws.weight = 0;
@@ -95,18 +100,18 @@ public class CodeAssistant {
                 ws.weight += getDistance(ws.chars, contentChars[i], i);
             }
         }
-        //°´ÕÕÏà¹Ø¶ÈÅÅĞò
+        //æŒ‰ç…§ç›¸å…³åº¦æ’åº
         sort(seletableArray);
         return seletableArray;
     }
 
     /**
-     * »ñÈ¡charµ½Ö¸¶¨Î»ÖÃµÄ×î¶Ì¾àÀëËã·¨
+     * è·å–charåˆ°æŒ‡å®šä½ç½®çš„æœ€çŸ­è·ç¦»ç®—æ³•
      *
-     * @param src    ±»ËÑË÷µÄ×Ö·û´®
-     * @param target Ä¿±ê×Ö·û
-     * @param index  Ö¸¶¨Î»ÖÃ
-     * @return srcÖĞËùÓĞtarget×Ö·ûµ½indexÎ»ÖÃ×î½üµÄ¾àÀë
+     * @param src    è¢«æœç´¢çš„å­—ç¬¦ä¸²
+     * @param target ç›®æ ‡å­—ç¬¦
+     * @param index  æŒ‡å®šä½ç½®
+     * @return srcä¸­æ‰€æœ‰targetå­—ç¬¦åˆ°indexä½ç½®æœ€è¿‘çš„è·ç¦»
      */
     public static int getDistance(char[] src, char target, int index) {
         int distance = 0;
@@ -121,10 +126,10 @@ public class CodeAssistant {
     }
 
     /**
-     * ÅĞ¶ÏtargetÖĞËùÓĞµÄ×Ö·ûÊÇ·ñÄÜÔÚsrcÖĞÕÒµ½£¬²¢ÇÒËûÃÇÔÚsrcÖĞ³öÏÖµÄË³Ğò·ûºÏÔÚtargetÖĞµÄË³Ğò
+     * åˆ¤æ–­targetä¸­æ‰€æœ‰çš„å­—ç¬¦æ˜¯å¦èƒ½åœ¨srcä¸­æ‰¾åˆ°ï¼Œå¹¶ä¸”ä»–ä»¬åœ¨srcä¸­å‡ºç°çš„é¡ºåºç¬¦åˆåœ¨targetä¸­çš„é¡ºåº
      * @param src
      * @param target
-     * @return ·ûºÏÌõ¼ş·µ»Øtrue
+     * @return ç¬¦åˆæ¡ä»¶è¿”å›true
      */
     public static boolean isMatch(String src, char[] target) {
         int len = target.length, fromIndex = -1;
@@ -135,7 +140,7 @@ public class CodeAssistant {
     }
 
     /**
-     * ¿ìËÙÅÅĞò£¬°´WeightedStringµÄweight×Ö¶Î´ÓĞ¡µ½´óÅÅÁĞ
+     * å¿«é€Ÿæ’åºï¼ŒæŒ‰WeightedStringçš„weightå­—æ®µä»å°åˆ°å¤§æ’åˆ—
      * @param array SelectableArray
      */
     private void sort(SelectableArray<WeightedString> array){
@@ -143,9 +148,9 @@ public class CodeAssistant {
     }
     
     /**
-     * ½«commandsµÄ¼¯ºÏÖĞµÄCommandName×ª»»ÎªStringµÄÊı×é£¬Í¬Ê±ÖØ¸´µÄCommandName£¨ÒòÖØÔØ²úÉú£©½«±»ÌŞ³ı
+     * å°†commandsçš„é›†åˆä¸­çš„CommandNameè½¬æ¢ä¸ºStringçš„æ•°ç»„ï¼ŒåŒæ—¶é‡å¤çš„CommandNameï¼ˆå› é‡è½½äº§ç”Ÿï¼‰å°†è¢«å‰”é™¤
      * @param commands
-     * @return ¿ÉÓÃÓÚCodeReminder¹¹ÔìµÄStringÊı×é
+     * @return å¯ç”¨äºCodeReminderæ„é€ çš„Stringæ•°ç»„
      */
     public static String[] commandsToCodes(List<Command> commands) {
     	String[] codes = new String[commands.size()];
@@ -161,8 +166,8 @@ public class CodeAssistant {
     }
 
     /**
-     * ´øÈ¨ÖµµÄString£¬¶ÔÓÚÈÎÒâÒ»¸öcode£¬ÆäÓëÓÃ»§ÊäÈëµÄÆ¥Åä¶È½«¼ÇÂ¼ÔÚÕâ¸öÀàµÄ¶ÔÏóµÄweight×Ö¶Î£¬codeÔÚstring×Ö¶Î
-     * @author congxiaoyao
+     * å¸¦æƒå€¼çš„Stringï¼Œå¯¹äºä»»æ„ä¸€ä¸ªcodeï¼Œå…¶ä¸ç”¨æˆ·è¾“å…¥çš„åŒ¹é…åº¦å°†è®°å½•åœ¨è¿™ä¸ªç±»çš„å¯¹è±¡çš„weightå­—æ®µï¼Œcodeåœ¨stringå­—æ®µ
+     * @author core
      */
     public class WeightedString {
         public String string;

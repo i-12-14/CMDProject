@@ -1,4 +1,4 @@
-package com.congxiaoyao.cmd;
+package com.cmd.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,16 +8,16 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * classÎÄ¼şµÄÈÈ¼ÓÔØÀà£¬Ê¹µÃcmd¿ò¼Ü¶¯Ì¬Ìí¼ÓºÍ´¦ÀíÃüÁî³ÉÎª¿ÉÄÜ
- * µ¥´¿µÄÍ¨¹ıÃüÁîÌí¼ÓÃüÁîÊÇÎŞÒâÒåµÄ£¬Ìí¼ÓÃüÁîµÄÒâÒåÔÚÓÚÄÜ¹»Í¨¹ıÌí¼ÓµÄÕâÌõÃüÁî´¦ÀíĞÂµÄÊÂÎñ
- * »ùÓÚ{@code DynamicClassLoader}ÎÒÃÇÌá¹©ÁËhandle_withÃüÁî£¬ËûµÄ´¦Àíº¯ÊıÊµÏÖÔÚCommandWindowHandlerÖĞ
- * handle_withÃüÁîĞèÒª¸ø¶¨Ò»¸ö²ÎÊı Óë{@code CommandAnalyzerManager#handleWith(Object) }²»Í¬µÄÊÇ
- * ÕâÀïµÄ²ÎÊıÊÇhandlingObjectµÄÀàÃû¶ø²»ÊÇÀàµÄÊµÀı
- * ¾Ù¸öÀı×Ó£¬Èç¹ûÎÒÃÇ¶¯Ì¬Ìí¼ÓÁËÒ»ÌõÃüÁîsayhello£¬ÎÒÃÇÓÖĞÂ½¨ÁËÀàcom.cmd.Handler£¬½«ËûµÄ´¦Àíº¯ÊıĞ´ÈëÁËÕâ¸öÀà
- * ²¢±êÃ÷ÁË×¢ÊÍ<code>@CommandName("sayhello")</code>
- * ÕâÊ±Ö»Òª½«Õâ¸öÀà±àÒëÒ»ÏÂ£¬¼´¿ÉÍ¨¹ıÃüÁî handle_with com.cmd.Handler ÊµÏÖÓë
- * ´úÂë<code>CommandAnalyzerManager.handleWith(new Handler());</code>ÏàÍ¬µÄ¹¦ÄÜ
- * Ò²¾ÍÊÇ¸øÃüÁîsayhello¶ÔÓ¦µÄ´¦Àíº¯Êı ´Ó¶øÍê³É¶¯Ì¬ÃüÁî´¦Àí
+ * classæ–‡ä»¶çš„çƒ­åŠ è½½ç±»ï¼Œä½¿å¾—cmdæ¡†æ¶åŠ¨æ€æ·»åŠ å’Œå¤„ç†å‘½ä»¤æˆä¸ºå¯èƒ½
+ * å•çº¯çš„é€šè¿‡å‘½ä»¤æ·»åŠ å‘½ä»¤æ˜¯æ— æ„ä¹‰çš„ï¼Œæ·»åŠ å‘½ä»¤çš„æ„ä¹‰åœ¨äºèƒ½å¤Ÿé€šè¿‡æ·»åŠ çš„è¿™æ¡å‘½ä»¤å¤„ç†æ–°çš„äº‹åŠ¡
+ * åŸºäº{@code DynamicClassLoader}æˆ‘ä»¬æä¾›äº†handle_withå‘½ä»¤ï¼Œä»–çš„å¤„ç†å‡½æ•°å®ç°åœ¨CommandWindowHandlerä¸­
+ * handle_withå‘½ä»¤éœ€è¦ç»™å®šä¸€ä¸ªå‚æ•° ä¸{@code CommandAnalyzerManager#handleWith(Object) }ä¸åŒçš„æ˜¯
+ * è¿™é‡Œçš„å‚æ•°æ˜¯handlingObjectçš„ç±»åè€Œä¸æ˜¯ç±»çš„å®ä¾‹
+ * ä¸¾ä¸ªä¾‹å­ï¼Œå¦‚æœæˆ‘ä»¬åŠ¨æ€æ·»åŠ äº†ä¸€æ¡å‘½ä»¤sayhelloï¼Œæˆ‘ä»¬åˆæ–°å»ºäº†ç±»com.core.Handlerï¼Œå°†ä»–çš„å¤„ç†å‡½æ•°å†™å…¥äº†è¿™ä¸ªç±»
+ * å¹¶æ ‡æ˜äº†æ³¨é‡Š<code>@CommandName("sayhello")</code>
+ * è¿™æ—¶åªè¦å°†è¿™ä¸ªç±»ç¼–è¯‘ä¸€ä¸‹ï¼Œå³å¯é€šè¿‡å‘½ä»¤ handle_with com.core.Handler å®ç°ä¸
+ * ä»£ç <code>CommandAnalyzerManager.handleWith(new Handler());</code>ç›¸åŒçš„åŠŸèƒ½
+ * ä¹Ÿå°±æ˜¯ç»™å‘½ä»¤sayhelloå¯¹åº”çš„å¤„ç†å‡½æ•° ä»è€Œå®ŒæˆåŠ¨æ€å‘½ä»¤å¤„ç†
  *
  * @author congxiaoyao
  * @version 1.0
