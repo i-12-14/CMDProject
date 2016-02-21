@@ -28,7 +28,6 @@ public @interface CmdDef {
      * 解析的规则是，如果函数名以handle开头，那handle后面的内容都被认为是命令名(如果出现大写字母会被转换为小写)
      * 如函数定义 public void handleFoo(){}
      * 默认情况下将会解析出命令名 foo
-     *
      * @see CommandName
      * @return
      */
@@ -37,6 +36,7 @@ public @interface CmdDef {
     /**
      * 定义这条命令的分隔符 默认为空格
      * 如果分隔符属于转义字符，将自动转义
+     * 若定义为null 对于一参或无参命令，CommandAnalyzer在处理的时候将忽略分隔符
      * @return
      */
     String delimiter() default " ";

@@ -26,7 +26,7 @@ import java.util.*;
  * //当然，所有的参数都不是必须的，下面是简化版的定义方式
  * <code>@CmdDef</code>
  * public void handleTest(String arg){
- *     //命令名通过函数名识别为test 分割符默认就是空格 描述在默认情况下以函数名代替
+ *     //命令名默认下通过函数名识别为test 分割符默认就是空格 描述在默认情况下以函数名代替
  * }
  * </pre><hr>
  * 除此之外，一条命令还可以由这三个注解来定义
@@ -74,6 +74,12 @@ import java.util.*;
  * 支持命令及处理函数的动态添加，通过{@code DynamicClassLoader}实现了class文件的热加载
  * 动态特性使得程序运行起来之后仍然可以动态的添加、删除命令甚至可以改变命令的处理方式
  * 这里只是留下关于动态特性的想象空间，并没有提供实际的接口，但理论上是完全可行的
+ *
+ * <p>其他</p>
+ * 一般情况下命令是必须有分隔符的，即使不使用注解去标明，也会存在默认分隔符空格
+ * 但对于一参及无参命令，允许无分隔符定义命令，只要将delemiter标为null即可
+ * <p>
+ * 如<code>@Description("null")</code>或<code>@CmdDef(description = "null")</code>
  *
  * @version 2.0
  * Created by congxiaoyao on 2016/2/19.
@@ -335,6 +341,8 @@ public class CommandAnalyzer implements Analysable {
                 //如果拿掉commandName后留下了一些内容
                 if (param.length() != 0) {
                     command.parameters = new String[]{param};
+                }else {
+                    command.parameters = null;
                 }
                 return command;
             }

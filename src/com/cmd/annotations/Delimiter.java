@@ -21,7 +21,8 @@ import java.lang.annotation.Target;
 public @interface Delimiter {
 
     /**
-     * 定义这条命令的分隔符 默认为空格
+     * 定义这条命令的分隔符 默认为空格 若定义为null
+     * 对于一参或无参命令，CommandAnalyzer在处理的时候将忽略分隔符
      * @return
      */
     String value() default " ";
