@@ -1,7 +1,11 @@
 package com.cmd.utils;
 
+import com.cmd.annotations.CommandName;
+import com.cmd.annotations.Delimiter;
+import com.cmd.annotations.Description;
 import com.cmd.core.Command;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
@@ -12,8 +16,14 @@ import java.lang.reflect.Method;
  */
 public class CmdUtils {
 
+    //用于定义一条命令的三个注解
+    @SuppressWarnings("unchecked")
+	public static Class<? extends Annotation>[] CMD_ANNOTATIONS = new Class[]{
+            CommandName.class, Delimiter.class, Description.class};
+
     //需要转义的字符
     private static String[] ec = {".","$","^","(",")","[","|","{","?","+","*",};
+
     /**
      * 分析这个String是否为ec数组中所包含的待转义的字符，如果是就给他转义喽
      * @param ch 待检查String
@@ -47,6 +57,15 @@ public class CmdUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 如果参数是Command类型或String数组类型返回true
+     * @param type
+     * @return 如果是可变参数类型返回true
+     */
+    public static boolean isVarTypes(Class<?> type) {
+        return type == Command.class || type == String[].class;
     }
 
     /**
@@ -94,7 +113,6 @@ public class CmdUtils {
      * @return
      */
     public static String getMoreSimpleMethodSignature(Method method) {
-        String completely = method.toString();
         String simple = getSimpleMethodSignature(method);
         String[] split = simple.split(" ");
         return split[split.length - 1];

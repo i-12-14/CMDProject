@@ -167,7 +167,7 @@ public class CodeAssistant {
 
     /**
      * 带权值的String，对于任意一个code，其与用户输入的匹配度将记录在这个类的对象的weight字段，code在string字段
-     * @author core
+     * @author congxiaoyao
      */
     public class WeightedString {
         public String string;

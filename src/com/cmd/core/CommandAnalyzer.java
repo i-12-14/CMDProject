@@ -23,10 +23,10 @@ import java.util.*;
  * public void test(String arg){
  *     //test函数即一参处理函数 当用户输入test XXX时，XXX将会通过参数arg传入函数
  * }
- * //当然，所有的参数都不是必须的，下面是简化版的定义方式
+ * //当然，CmdDef中所有的参数都不是必须的，下面是简化版的定义方式
  * <code>@CmdDef</code>
  * public void handleTest(String arg){
- *     //命令名默认下通过函数名识别为test 分割符默认就是空格 描述在默认情况下以函数名代替
+ *     //commandName默认下通过函数名识别,这里为test delimiter默认就是空格 description在默认情况下以函数名代替
  * }
  * </pre><hr>
  * 除此之外，一条命令还可以由这三个注解来定义
@@ -36,7 +36,7 @@ import java.util.*;
  * <li><code>@Description</code>
  * </ul>
  * 实质上是将{@code CmdDef}中的参数拆解开来分别定义
- * 需要注意的是，这三个注解不能与{@code CmdDef}同时出现在同一个处理函数上，将导致这三个注解失效
+ * 需要注意的是，这三个注解不能与{@code CmdDef}同时出现在同一个处理函数上，否则将导致这三个注解失效
  * <p>
  * 当绑定动作完成，即可使用本类处理一条输入，可以分为如下几步
  * <ul>
@@ -57,12 +57,13 @@ import java.util.*;
  * 对于有参命令，我们可能仅仅关心某个参数中的某个特定值，通常下我们会通过分支语句来拦截这些特定值
  * 但我们可以通过OnlyCare注解来帮我们拦截敏感参数，他可以被注解在处理函数上或处理函数的参数前
  * 想要了解详细的使用方法详见{@code OnlyCare}类内注释
- * 需要说明的是，假设同时存在两个处理相同命令的参数相同的处理函数，其中一个带有OnlyCare注解，
+ * 需要说明的是，假设同时存在两个处理相同命令且参数个数相同的处理函数，其中一个带有OnlyCare注解，另一个不带，
  * CommandAnalyzer会优先尝试调用带有OnlyCare注解的处理函数
  *
  * <p>关于自动参数类型转换</p>
- * 如果命令中的参数是基本数据类型的一种 如两数相加的命令，两个参数的类型实际是int型的
- * 那么只要将处理函数的参数类型定义为int或Integer类型，CommandAnalyzer会自动将String类型的参数转为int/Integer型
+ * 一般来说，我们必须将处理函数的参数定义为String类型的
+ * 但是如果命令中的参数是基本数据类型的一种 如两整数相加的命令，两个参数的类型实际是int型的
+ * 那么允许将处理函数的参数类型定义为int或Integer类型，CommandAnalyzer会自动将String类型的参数转为int/Integer型
  *
  * <p>关于处理函数的多类分布</p>
  * 因为{@code CommandAnalyzer}是单例的，所以可以在任何地方获取{@code CommandAnalyzer}的实例
@@ -80,6 +81,8 @@ import java.util.*;
  * 但对于一参及无参命令，允许无分隔符定义命令，只要将delemiter标为null即可
  * <p>
  * 如<code>@Description("null")</code>或<code>@CmdDef(description = "null")</code>
+ * <p>
+ * 我们提供了Outline注解用于阐明对于一个CommandName的总体性的概述，使用方式见类头注释
  *
  * @version 2.0
  * Created by congxiaoyao on 2016/2/19.
@@ -91,6 +94,7 @@ public class CommandAnalyzer implements Analysable {
     private List<Command> commands;
     private Map<Character, int[]> commandsDirectory;
     private Map<String, String> outlineMap;
+    private Map<Class<?>,StringPraser> typesMap;
 
     /**
      * @return 单例模式，获取CommandAnalyzer的实例
@@ -123,6 +127,7 @@ public class CommandAnalyzer implements Analysable {
         commands = new ArrayList<>();
         commandsDirectory = new HashMap<>();
         outlineMap = new TreeMap<>();
+        initTypesMap();
     }
 
     /**
@@ -170,6 +175,32 @@ public class CommandAnalyzer implements Analysable {
         return this;
     }
 
+    public void initTypesMap() {
+        typesMap = new HashMap<>(14);
+        typesMap.put(Boolean.class,(arg)->{
+            if(arg.equals("true")) return true;
+            else if (arg.equals("false")) return false;
+            else return null;
+        });
+        typesMap.put(boolean.class,(arg)->{
+            if(arg.equals("true")) return true;
+            else if (arg.equals("false")) return false;
+            else return null;
+        });
+        typesMap.put(Integer.class,(arg) -> Integer.parseInt(arg));
+        typesMap.put(int.class,(arg) ->     Integer.parseInt(arg));
+        typesMap.put(Double.class,(arg) -> Double.parseDouble(arg));
+        typesMap.put(double.class,(arg) -> Double.parseDouble(arg));
+        typesMap.put(Byte.class,(arg) -> Byte.parseByte(arg));
+        typesMap.put(byte.class,(arg) -> Byte.parseByte(arg));
+        typesMap.put(Float.class,(arg) -> Float.parseFloat(arg));
+        typesMap.put(float.class,(arg) -> Float.parseFloat(arg));
+        typesMap.put(Short.class,(arg) -> Short.parseShort(arg));
+        typesMap.put(short.class,(arg) -> Short.parseShort(arg));
+        typesMap.put(Long.class,(arg) -> Long.parseLong(arg));
+        typesMap.put(String.class, (arg) -> arg);
+    }
+
     /**
      * 尝试通过method上标记的注解来生成Command对象
      *
@@ -215,12 +246,12 @@ public class CommandAnalyzer implements Analysable {
         }
         //其他情况将不被认为能解析出命令
         else return null;
-        //由这个method对象生成handlingMethod
-        HandlingMethod handlingMethod = new HandlingMethod(method);
-        handlingMethod.setDescription(description);
         try {
+            //由这个method对象生成handlingMethod
+            HandlingMethod handlingMethod = new HandlingMethod(method);
+            handlingMethod.setDescription(description);
             command.addHandlingMethod(handlingMethod);
-        } catch (IllegalHandlingMethodException e) {
+        } catch (IllegalHandlingMethodException | BadDefinitionException e) {
             e.printStackTrace();
             return null;
         }
@@ -417,7 +448,7 @@ public class CommandAnalyzer implements Analysable {
                 return true;
             }
         }
-        //现在不存在可变参数的处理函数了，检查handlingMethod的参数个数与command中所保存的参数个数吻合
+        //现在不存在可变参数的处理函数了，检查handlingMethod的参数个数与command中所保存的参数个数是否吻合
         if (mtdParCnt != cmdParCnt) return false;
         //检查OnlyCare是否能通过
         if (!checkIfOnlyCareCanPass(handlingMethod, command)) return false;
@@ -430,8 +461,10 @@ public class CommandAnalyzer implements Analysable {
         Class<?>[] types = handlingMethod.getParameterTypes();
         Object[] objects = new Object[types.length];
         try {
-            for (int i = 0, len = objects.length; i < len; i++)
+            for (int i = 0, len = objects.length; i < len; i++){
                 objects[i] = toType(command.parameters[i], types[i]);
+                if (objects[i] == null) return false;
+            }
         } catch (IllegalHandlingMethodException e) {
             System.err.println(handlingMethod.method.toString());
             e.printStackTrace();
@@ -469,26 +502,16 @@ public class CommandAnalyzer implements Analysable {
      * @return
      * @throws IllegalHandlingMethodException
      */
-    private static Object toType(String arg, Class<?> type) throws IllegalHandlingMethodException {
-        Object object = arg;
-        if (type == byte.class || type == Byte.class) {
-            object = Byte.parseByte(arg);
-        } else if (type == short.class || type == Short.class) {
-            object = Short.parseShort(arg);
-        } else if (type == int.class || type == Integer.class) {
-            object = Integer.parseInt(arg);
-        } else if (type == long.class || type == Long.class) {
-            object = Long.parseLong(arg);
-        } else if (type == float.class || type == Float.class) {
-            object = Float.parseFloat(arg);
-        } else if (type == double.class || type == Double.class) {
-            object = Double.parseDouble(arg);
-        } else if (type == boolean.class || type == Boolean.class) {
-            object = Boolean.parseBoolean(arg);
-        } else if (type != String.class) {
-            throw new IllegalHandlingMethodException();
+    private Object toType(String arg, Class<?> type) throws IllegalHandlingMethodException {
+        StringPraser praser = typesMap.get(type);
+        Object result = null;
+        if(praser == null) throw new IllegalHandlingMethodException();
+        try {
+            result = praser.prase(arg);
+        } catch (Exception e) {
+            return null;
         }
-        return object;
+        return result;
     }
 
     @Override
@@ -589,5 +612,9 @@ public class CommandAnalyzer implements Analysable {
             size += command.getHandlingMethods().size();
         }
         return size;
+    }
+
+    public String getOutLine(String commandName) {
+        return outlineMap.get(commandName);
     }
 }

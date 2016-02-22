@@ -9,7 +9,9 @@ package com.cmd.core;
  */
 public class IllegalHandlingMethodException extends Exception {
 
-    private static final String MSG = "handling method param types error ";
+	private static final long serialVersionUID = -6684428183922830998L;
+	
+	private static final String MSG = "handling method param types error\n";
 
     public IllegalHandlingMethodException() {
         super(MSG);

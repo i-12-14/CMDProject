@@ -29,8 +29,7 @@ public class DynamicClassLoader extends ClassLoader {
         super(parent);
     }
 
-    @SuppressWarnings("unchecked")
-    public Class loadClass(String classPath, String className)
+    public Class<?> loadClass(String classPath, String className)
             throws ClassNotFoundException {
         try {
             className += ".class";

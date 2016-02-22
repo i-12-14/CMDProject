@@ -19,8 +19,7 @@ public class Demo {
         window.setOnSubmitListener((content -> analyzer.process(content)));
 
         //绑定命令的处理函数所在的类的实例，可以是多个
-        analyzer = CommandAnalyzer.getInstance();
-        analyzer.addHandlingObject(new Demo());
+        analyzer = CommandAnalyzer.handleWith(new Demo());
         analyzer.addHandlingObject(new HelpHandler());
         analyzer.addHandlingObject(new CommandWindowHandler(window));
 
@@ -33,10 +32,9 @@ public class Demo {
 
 	@CommandName
     public final void handleWelcome(Command command) {
-		System.out.println("\n\n本demo展示了这套框架的基本使用方法\n"
-				+ "这里添加了一些有关这个窗口的操作的命令\n"
-				+ "并且已经实现了相应功能，可以输入help进行查看\n"
-				+ "详情见com.cmd.core.CommandAnalyzer类头注释\n"
-				+ "\4");
-	}
+        System.out.println("\n\n本demo展示了这套框架的基本使用方法\n"
+                + "这里添加了一些有关这个窗口的操作的命令\n"
+                + "并且已经实现了相应功能，可以输入help进行查看\n"
+                + "详情见com.cmd.core.CommandAnalyzer类头注释\n" + "\4");
+    }
 }

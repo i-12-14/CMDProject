@@ -8,7 +8,9 @@ package com.cmd.core;
  */
 public class NoneHandlingMethodException extends Exception{
 
-    private static final String MSG = "no HandlingMethod is bound";
+	private static final long serialVersionUID = 6374099046757734005L;
+	
+	private static final String MSG = "no HandlingMethod is bound\n";
 
     public NoneHandlingMethodException() {
         super(MSG);

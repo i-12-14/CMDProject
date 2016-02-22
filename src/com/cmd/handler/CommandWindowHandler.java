@@ -1,13 +1,12 @@
 package com.cmd.handler;
 
+import javax.swing.JFrame;
+
 import com.cmd.annotations.CommandName;
 import com.cmd.annotations.OnlyCare;
 import com.cmd.annotations.Outline;
-import com.cmd.core.*;
 import com.cmd.extras.CodeAssistant;
 import com.cmd.extras.CommandWindow;
-
-import javax.swing.*;
 
 /**
  * 主要为了处理对CommandWindow的操作的命令，如清屏、退出、设置窗口大小提示语等

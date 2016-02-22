@@ -1,8 +1,10 @@
 package com.cmd.core;
 
+import com.cmd.annotations.CmdDef;
 import com.cmd.annotations.OnlyCare;
 import com.cmd.utils.CmdUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -29,7 +31,7 @@ public class HandlingMethod {
     Object invoker;                     //用于反射调用
     VariableType variadicType;          //处理函数的参数的属性
 
-    public HandlingMethod(Method method) {
+    public HandlingMethod(Method method) throws BadDefinitionException {
         this.method = method;
         //分析VariadicType的值
         variadicType = VariableType.TYPE_IMMUTABLE;
@@ -53,6 +55,7 @@ public class HandlingMethod {
                 paramCount = 1;
                 onlyCareCount = 1;
             }
+            checkDefinitionException();
             return;
         }
         Parameter[] parameters = method.getParameters();
@@ -66,7 +69,10 @@ public class HandlingMethod {
             }
         }
         //如果没有参数标有OnlyCare注解，直接返回
-        if (index == -1) return;
+        if (index == -1) {
+            checkDefinitionException();
+            return;
+        }
         //将OnlyCare中的参数放到careAbout数组中
         careAbout = new String[index + 1];
         for (int i = 0; i < careAbout.length; i++) {
@@ -82,12 +88,52 @@ public class HandlingMethod {
                 careAbout[i] = careWhat;
             }
         }
+        checkDefinitionException();
+    }
+
+    /**
+     * 检查用户定义时出现的问题并抛出异常
+     */
+    private void checkDefinitionException() throws BadDefinitionException {
+        //在处理函数中带参数的情况下将OnlyCare标记在函数上
+        if (method.getParameterCount() >= 1 && method.isAnnotationPresent(OnlyCare.class)) {
+            throw new BadDefinitionException(BadDefinitionException.ONLYCARE_ERROR,
+                    method.toString());
+        }
+        //将OnlyCare标记在了可变参数(Command类型或String[]类型)上
+        if (isOnlyCareAnnotated() && parameterTypes != null) {
+            for (int i = 0; i < parameterTypes.length; i++) {
+                if(getOnlyCareByParam(i) != null &&
+                        CmdUtils.isVarTypes(parameterTypes[i])){
+                    throw new BadDefinitionException(BadDefinitionException.ONLYCARE_ERROR,
+                            method.toString());
+                }
+            }
+        }
+        //将CmdDef注解与另外的三个注解混合使用
+        if (method.isAnnotationPresent(CmdDef.class)) {
+            Class<? extends Annotation>[] annotations = CmdUtils.CMD_ANNOTATIONS;
+            for (Class<? extends Annotation> annotation : annotations) {
+                if (method.isAnnotationPresent(annotation)) {
+                    throw new BadDefinitionException(BadDefinitionException.DECLARE_ERROR,
+                            method.toString());
+                }
+            }
+        }
+    }
+
+    /**
+     * @return 处理函数上(或其参数上)标有OnlyCare注解返回true
+     */
+    public boolean isOnlyCareAnnotated() {
+        return careAbout != null;
     }
 
     /**
      * @param paramIndex 从0开始
      * @return 获取此方法参数上标记的OnlyCare注解的参数，没有返回null
      * 对于无参方法，方法上带有OnlyCare注解也可以用这种方式获取
+     * 注意！！调用次方法前最好调用isOnlyCareAnnotated，除非你有十足的把我
      */
     public String getOnlyCareByParam(int paramIndex) {
         if (careAbout.length <= paramIndex) return null;
@@ -104,22 +150,14 @@ public class HandlingMethod {
         Class<?>[] types = getParameterTypes();
         if (types.length > 1) {
             for (Class<?> type : types) {
-                if (type == Command.class || type == String[].class || !CmdUtils.isBaseTypes(type)) {
+                if (CmdUtils.isVarTypes(types[0]) || !CmdUtils.isBaseTypes(type)) {
                     return false;
                 }
             }
         } else if (types.length == 1) {
-            return CmdUtils.isBaseTypes(types[0]) || types[0] == String[].class ||
-                    types[0] == Command.class;
+            return CmdUtils.isBaseTypes(types[0]) || CmdUtils.isVarTypes(types[0]);
         }
         return true;
-    }
-
-    /**
-     * @return 处理函数上(或其参数上)标有OnlyCare注解返回true
-     */
-    public boolean isOnlyCareAnnotated() {
-        return careAbout != null;
     }
 
     public Class<?>[] getParameterTypes() {

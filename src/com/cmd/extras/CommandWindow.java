@@ -15,9 +15,9 @@ import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 
+import com.cmd.extras.CodeAssistant.WeightedString;
 import com.cmd.utils.RoundList;
 import com.cmd.utils.SelectableArray;
-import com.cmd.extras.CodeAssistant.WeightedString;
 
 /**
  * 用JTextArea写成的仿windows的CMD窗口，作为CMD框架的一部分，主要负责UI方面的内容
@@ -39,6 +39,8 @@ import com.cmd.extras.CodeAssistant.WeightedString;
 
 public class CommandWindow extends JFrame{
 
+	private static final long serialVersionUID = -5939524562084541945L;
+	
 	public static final KeyStroke ENTER = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0);
 	public static final KeyStroke BACK = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0);
 	public static final KeyStroke PASTE = KeyStroke.getKeyStroke(KeyEvent.VK_V,KeyEvent.CTRL_MASK);
@@ -522,7 +524,7 @@ public class CommandWindow extends JFrame{
 
 	/**
 	 * 用户输入的内容会通过此接口回调，将每一次用户的一行输入作为函数的参数通知外界
-	 * @author core
+	 * @author congxiaoyao
 	 *
 	 */
 	public interface OnSubmitListener{
