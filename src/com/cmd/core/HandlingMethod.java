@@ -17,7 +17,7 @@ import java.lang.reflect.Parameter;
  * @see com.cmd.annotations.Delimiter
  * @see com.cmd.annotations.Description
  *
- * @version 2.0
+ * @version 2.1
  * Created by congxiaoyao on 2016/2/19.
  */
 public class HandlingMethod {

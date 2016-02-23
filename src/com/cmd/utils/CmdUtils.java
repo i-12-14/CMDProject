@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * 给整个工程用的工具类
  *
- * @version 2.0
+ * @version 2.1
  * Created by congxiaoyao on 2016/2/13.
  */
 public class CmdUtils {
@@ -94,10 +94,9 @@ public class CmdUtils {
      */
     public static String getSimpleMethodSignature(Method method) {
         String completely = method.toString();
-        String[] methodInfo= completely.split(" ");
-        String methodName = methodInfo[methodInfo.length - 1];
-        int left = methodName.indexOf('(');
-        methodName = methodName.substring(0, left);
+        String half = completely.substring(0, completely.indexOf('('));
+        String[] methodInfos = half.split(" ");
+        String methodName = methodInfos[methodInfos.length - 1];
         String[] split = methodName.split("\\.");
         String simple = split[split.length - 1];
         simple = completely.replace(methodName,simple);
@@ -113,8 +112,9 @@ public class CmdUtils {
      * @return
      */
     public static String getMoreSimpleMethodSignature(Method method) {
-        String simple = getSimpleMethodSignature(method);
+        String org = getSimpleMethodSignature(method);
+        String simple = org.substring(0, org.indexOf('('));
         String[] split = simple.split(" ");
-        return split[split.length - 1];
+        return org.replace(simple, split[split.length - 1]);
     }
 }

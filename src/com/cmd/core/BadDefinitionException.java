@@ -10,7 +10,7 @@ package com.cmd.core;
  * <li>处理函数中同时存在可变参数及不可变参数
  * </ul>
  *
- * @version 2.0
+ * @version 2.1
  * Created by congxiaoyao on 2016/2/22.
  */
 public class BadDefinitionException extends Exception {

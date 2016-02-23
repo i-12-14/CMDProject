@@ -84,7 +84,7 @@ import java.util.*;
  * <p>
  * 我们提供了Outline注解用于阐明对于一个CommandName的总体性的概述，使用方式见类头注释
  *
- * @version 2.0
+ * @version 2.1
  * Created by congxiaoyao on 2016/2/19.
  */
 public class CommandAnalyzer implements Analysable {
@@ -92,8 +92,11 @@ public class CommandAnalyzer implements Analysable {
     private static CommandAnalyzer commandAnalyzer;
 
     private List<Command> commands;
+    //可以通过这个map按照首字母在commands中查找，提高效率，这个int[]记录了startIndex跟length两个值
     private Map<Character, int[]> commandsDirectory;
+    //通过commandName去寻找对应的outline
     private Map<String, String> outlineMap;
+    //为了快速类型转换，通过type查找对应的转换动作
     private Map<Class<?>,StringPraser> typesMap;
 
     /**
@@ -117,9 +120,7 @@ public class CommandAnalyzer implements Analysable {
      */
     public static CommandAnalyzer handleWith(Object handlingObject) {
         CommandAnalyzer analyzer = getInstance();
-        synchronized (analyzer) {
-            analyzer.addHandlingObject(handlingObject);
-        }
+        analyzer.addHandlingObject(handlingObject);
         return analyzer;
     }
 
@@ -541,10 +542,14 @@ public class CommandAnalyzer implements Analysable {
         for (int i = start; i < end; i++) {
             if (command.equals(commands.get(i))) {
                 commands.remove(i);
+                int[] infos = commandsDirectory.get(command.commandName.charAt(0));
+                if (infos[1] == 1) {
+                    commandsDirectory.remove(command.commandName.charAt(0));
+                }
+                updateCommandsDirectory();
                 break;
             }
         }
-        updateCommandsDirectory();
     }
 
     @Override
