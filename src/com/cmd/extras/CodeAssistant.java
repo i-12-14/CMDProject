@@ -1,9 +1,11 @@
 package com.cmd.extras;
 
 import com.cmd.core.Command;
+import com.cmd.core.HandlingMethod;
 import com.cmd.utils.QuickSort;
 import com.cmd.utils.SelectableArray;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class CodeAssistant {
     }
 
 	public CodeAssistant(List<Command> commands) {
-    	this(commandsToCodes(commands));
+    	this(commandsToCodesX(commands));
     }
 
 	/**
@@ -165,7 +167,49 @@ public class CodeAssistant {
 		return Arrays.copyOf(codes, newLength);
     }
 
-    /**
+    public static String[] commandsToCodesX(List<Command> commands) {
+        List<String> list = getOnlyCareList(commands);
+        int n = list.size();
+        int m = commands.size();
+        String[] codes = new String[m+n];
+        for(int i=0;i<m;i++) {
+            String code = commands.get(i).commandName;
+            codes[i] = code;
+        }
+        for (int i = m; i <m+n ; i++) {
+            String code =list.get(i-m);
+            codes[i] = code;
+        }
+        return codes;
+    }
+
+    public static List<String> getOnlyCareList(List<Command> commands) {
+        List<String> sList = new ArrayList<>();
+        int n = commands.size();
+        for (int i = 0; i < n; i++) {
+            Command command = commands.get(i);
+            List<HandlingMethod> hList = command.getHandlingMethods();
+            int m = hList.size();
+            for (int j = 0; j < m; j++) {
+                HandlingMethod handlingMethod = hList.get(j);
+                if (!handlingMethod.isOnlyCareAnnotated()) continue;
+                int z = handlingMethod.getParamCount();
+                String temp = command.commandName;
+                for (int k = 0; k < z; k++) {
+                    String arg = handlingMethod.getOnlyCareByParam(k);
+                    if (arg == null) continue;
+                    if (command.delimiter.equals("null")) temp = arg;
+                    else temp += (command.delimiter + arg);
+                }
+                sList.add(temp);
+
+            }
+        }
+        return sList;
+    }
+
+
+/**
      * 带权值的String，对于任意一个code，其与用户输入的匹配度将记录在这个类的对象的weight字段，code在string字段
      * @author congxiaoyao
      */

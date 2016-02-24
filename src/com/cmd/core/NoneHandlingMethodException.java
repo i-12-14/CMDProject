@@ -10,7 +10,7 @@ public class NoneHandlingMethodException extends Exception{
 
 	private static final long serialVersionUID = 6374099046757734005L;
 	
-	public static final String MSG = "can't find any HandlingMethod to handle this command\n";
+	public static final String MSG = "can't find any method to handle this command\n";
 
     public NoneHandlingMethodException() {
         super(MSG);

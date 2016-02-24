@@ -99,6 +99,8 @@ public class CommandAnalyzer implements Analysable {
     //为了快速类型转换，通过type查找对应的转换动作
     private Map<Class<?>,StringPraser> typesMap;
 
+    private static boolean keepDispatch = false;
+
     /**
      * @return 单例模式，获取CommandAnalyzer的实例
      */
@@ -122,13 +124,6 @@ public class CommandAnalyzer implements Analysable {
         CommandAnalyzer analyzer = getInstance();
         analyzer.addHandlingObject(handlingObject);
         return analyzer;
-    }
-
-    private CommandAnalyzer() {
-        commands = new ArrayList<>();
-        commandsDirectory = new HashMap<>();
-        outlineMap = new TreeMap<>();
-        initTypesMap();
     }
 
     /**
@@ -176,6 +171,17 @@ public class CommandAnalyzer implements Analysable {
         return this;
     }
 
+    public static void keepDispatch() {
+        keepDispatch = true;
+    }
+
+    private CommandAnalyzer() {
+        commands = new ArrayList<>();
+        commandsDirectory = new HashMap<>();
+        outlineMap = new TreeMap<>();
+        initTypesMap();
+    }
+
     public void initTypesMap() {
         typesMap = new HashMap<>(14);
         typesMap.put(Boolean.class,(arg)->{
@@ -215,9 +221,8 @@ public class CommandAnalyzer implements Analysable {
         //第一种情况是方法上标有CmdDef注解
         if (method.isAnnotationPresent(CmdDef.class)) {
             CmdDef cmdDef = method.getAnnotation(CmdDef.class);
-            //如果cmdDef.commandName()是默认值将试图通过函数名解析
+            //如果cmdDef.commandName()是默认值将使用函数名作为命令名
             String commandName = reanalyseCommandName(cmdDef.commandName(), method);
-            if (commandName == null) return null;
             //如果分隔符是转义字符就给他转义
             String delimiter = CmdUtils.characterEscape(cmdDef.delimiter());
             command = new Command(commandName, delimiter);
@@ -227,9 +232,8 @@ public class CommandAnalyzer implements Analysable {
         //第二种情况是方法上至少标有CommandName注解
         else if (method.isAnnotationPresent(CommandName.class)) {
             CommandName annotation = method.getAnnotation(CommandName.class);
-            //如果annotation.value()是默认值将试图通过函数名解析
+            //如果annotation.value()是默认值将使用函数名作为命令名
             String commandName = reanalyseCommandName(annotation.value(), method);
-            if (commandName == null) return null;
             String delimiter = " ";
             //如果存在方法上存在Delimiter注解，则delimiter为注解中的值
             if (method.isAnnotationPresent(Delimiter.class)) {
@@ -268,14 +272,7 @@ public class CommandAnalyzer implements Analysable {
      * 分析失败是指无法通过函数名解析命令名(这条命令不是以handle开头)
      */
     private String reanalyseCommandName(String commandName, Method method) {
-        if (commandName.length() == 0) {
-            if (CmdUtils.isBeginWith("handle", method.getName(), null)) {
-                commandName = method.getName().replaceFirst("handle", "").toLowerCase();
-            } else {
-                return null;
-            }
-        }
-        return commandName;
+        return commandName.length() == 0 ? method.getName() : commandName;
     }
 
     /**
@@ -407,19 +404,22 @@ public class CommandAnalyzer implements Analysable {
      * @return 如果传入的command处理成功返回true否则返回false
      */
     public boolean handleCommand(Command command) throws NoneHandlingMethodException {
+        boolean handled = false;
         List<HandlingMethod> handlingMethods = command.getHandlingMethods();
         if (handlingMethods.isEmpty())
             throw new NoneHandlingMethodException(command.toString());
         for (HandlingMethod handlingMethod : handlingMethods) {
             try {
                 if (checkAndInvoke(command, handlingMethod)) {
-                    return true;
+                    if(!keepDispatch) return true;
+                    handled = true;
+                    keepDispatch = false;
                 }
             } catch (InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
-        return false;
+        return handled;
     }
 
     /**

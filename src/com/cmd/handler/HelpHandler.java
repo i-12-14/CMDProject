@@ -23,7 +23,7 @@ public class HelpHandler extends BaseHandler {
      * 输出帮助信息
      */
     @CommandName
-    public void handleHelp() {
+    public void help() {
         System.out.println("\5" + getAnalysable().getCommandsDescription());
     }
 
@@ -36,7 +36,7 @@ public class HelpHandler extends BaseHandler {
      * @param commandName
      */
     @CommandName
-    public void handleHelp(String commandName) {
+    public void help(String commandName) {
         System.out.println("\5" + getAnalysable().getCommandInfo(commandName));
     }
 

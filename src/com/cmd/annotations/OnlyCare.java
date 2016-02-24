@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  *
  * 对于含有两个参数的命令foo，假设我们只希望处理第二个参数为sensitive时的情况，那么他的处理函数可以定义如下
  * <code>@CommandName("foo")</code>
- * public void foo(String arg1, @OnlyCare("sensitive")String arg2){
+ * public void foo(MyString arg1, @OnlyCare("sensitive")MyString arg2){
  *     System.out.println("foo XXX sensitive");
  * }
  * 只要将所关心的内容通过OnlyCare注解标注在方法的参数前即可实现敏感参数拦截

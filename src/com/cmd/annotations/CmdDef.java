@@ -24,10 +24,7 @@ import java.lang.annotation.Target;
 public @interface CmdDef {
 
     /**
-     * 这条命令的名字，如果使用默认值，将试图解析函数名作为commandName
-     * 解析的规则是，如果函数名以handle开头，那handle后面的内容都被认为是命令名(如果出现大写字母会被转换为小写)
-     * 如函数定义 public void handleFoo(){}
-     * 默认情况下将会解析出命令名 foo
+     * 这条命令的名字，如果使用默认值，是默认值将使用函数名作为命令名
      * @see CommandName
      * @return
      */

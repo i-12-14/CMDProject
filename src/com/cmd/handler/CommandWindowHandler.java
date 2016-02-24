@@ -29,7 +29,9 @@ import com.cmd.extras.CommandWindow;
  * @version 2.0
  */
 
-@Outline(commandNames = {"window"},outlines = {"设置窗口属性 max full nobar"})
+@Outline(commandNames = {"720p","cls", "exit","version", "height","font", "close","window", "bound","hint","ecc"},
+         outlines = {"设置窗口尺寸为720P","清屏", "退出","版本号", "设置窗口高度","设置字体大小",
+                     "设置能否用鼠标关闭窗口","max、full、nobar", "设置窗口宽高","设置hint文字","代码提示"})
 public class CommandWindowHandler extends BaseHandler {
 	
 	private CommandWindow window;
@@ -46,19 +48,19 @@ public class CommandWindowHandler extends BaseHandler {
 	}
 
 	/**
-	 * CommandName注解没有括号也是可以的 但需要以handle开头
+	 * CommandName注解没有括号也是可以的
 	 */
 	@CommandName
-	public void handleExit() {
+	public void exit() {
 		window.closeWindow();
 	}
 
 	@CommandName
-	public void handleVersion() {
+	public void version() {
 		System.out.println("v2.0");
 	}
 
-	@CommandName
+	@CommandName("720p")
 	public void handle720P() {
 		getAnalysable().process("bound 1280 720");
 		getAnalysable().process("font 20");
@@ -137,7 +139,7 @@ public class CommandWindowHandler extends BaseHandler {
 	}
 
 	@CommandName
-	public void handleHint(String arg) {
+	public void hint(String arg) {
 		window.setHint(arg);
 	}
 
