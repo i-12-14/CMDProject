@@ -117,4 +117,70 @@ public class CmdUtils {
         String[] split = simple.split(" ");
         return org.replace(simple, split[split.length - 1]);
     }
+
+    /*******************************************************************
+     * 这一大段是一个算法，实现通过一个字符来分割字符串的功能
+     * java提供的split函数在这种情况下效率低到令人发指，于是手写了递归版分割算法
+     * 返回被分割出来的数组
+     */
+    private static String[] result = null;  //用于保存分割的结果
+    private static char[] content = null;   //待分割的字符串的char数组
+    private static char delimiter = 0;         //分隔符
+    private static int end = 0;             //对content字串分析的结束位置
+
+    /**
+     * 整个函数对静态变量content做分析，当函数运行结束，结果保存在result数组中
+     * @param start 从content的哪一个位置开始分析
+     * @param putIndex 将查找出来的内容放到result数组中的哪一个位置
+     */
+    private static void split(int start,int putIndex) {
+        //处理分隔符在末尾的情况
+        if(start >= end){
+            result = new String[putIndex];
+            return;
+        }
+        //寻找分隔符，如果找到的话先让分割符后面的内容继续去寻找新的分隔符位置
+        //再把自分隔符前面的内容放入result数组
+        for (int i = start; i < end; i++) {
+            if (content[i] == delimiter) {
+                split(i + 1,putIndex + 1);
+                result[putIndex] = new String(content, start, i - start);
+                return;
+            }
+        }
+        //到达了字串的末尾仍然没有找到分隔符，那可以向上层返回了
+        result = new String[putIndex + 1];
+        result[putIndex] = new String(content, start, end - start);
+    }
+
+    /**
+     * 真正可以提供给用户用的字串分割函数，通过一个char来分割字串
+     * 实现依赖private的重载子函数，递归分割
+     * @param content 要被分割的字串的char数组
+     * @param start 起始位置
+     * @param delimiter 分隔符
+     * @return 分割后的内容的数组 与jdk的split函数返回一样
+     */
+    public static String[] split(char[] content, int start, char delimiter) {
+        if (content.length == 1 && content[0] == delimiter) {
+            return new String[0];
+        }
+        CmdUtils.content = content;
+        CmdUtils.delimiter = delimiter;
+        CmdUtils.end = content.length;
+        split(start, 0);
+        return result;
+    }
+
+    /**
+     * 与上个函数不同的是这个函数默认指定开始分割的起始位置为0
+     * @param content 要被分割的字串的char数组
+     * @param delimiter 分隔符
+     * @return 分割后的内容的数组 与jdk的split函数返回一样
+     */
+    public static String[] split(char[] content, char delimiter) {
+        split(content, 0, delimiter);
+        return result;
+    }
+    //******************************************************************
 }

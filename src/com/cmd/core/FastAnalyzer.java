@@ -1,6 +1,7 @@
 package com.cmd.core;
 
 import com.cmd.annotations.Outline;
+import com.cmd.utils.CmdUtils;
 
 import java.lang.reflect.Method;
 import java.util.TreeMap;
@@ -131,8 +132,7 @@ public class FastAnalyzer extends CommandAnalyzer{
     @Override
     public Command analyze(String content) {
         int len = content.length() > realTreeHeight ? realTreeHeight : content.length();
-        char[] inputs = new char[len];
-        content.getChars(0, len, inputs, 0);
+        char[] inputs = content.toCharArray();
         int nowIndex = -1;
         Node finder = new Node('\0');
         Node nowNode = rootNode;
@@ -146,7 +146,7 @@ public class FastAnalyzer extends CommandAnalyzer{
             if (nowNode.commands == null) continue;
             for (Command command : commands) {
                 if (isDelimiterMatch(command.delimiter, content, nowIndex+1)) {
-                    analyzeCommandParam(command, content);
+                    analyzeCommandParam(command, inputs, content);
                     return command;
                 }
             }
@@ -163,7 +163,7 @@ public class FastAnalyzer extends CommandAnalyzer{
      */
     private boolean isDelimiterMatch(String delimiter, String content, int startIndex) {
         if (content.length() == startIndex) return true;
-        if(delimiter.equals("null")) return true;
+        if(delimiter == null) return true;
         int delimiterLen = delimiter.length();
         if (delimiterLen + startIndex > content.length()) return false;
         return delimiter.equals(content.substring(startIndex, startIndex + delimiterLen));
@@ -174,36 +174,72 @@ public class FastAnalyzer extends CommandAnalyzer{
      * @param command
      * @param content
      */
-    private void analyzeCommandParam(Command command, String content) {
-        //无分隔符情况
-        if (command.delimiter.equals("null")) {
-            String param = content.substring(0, command.commandName.length());
-            //如果拿掉commandName后留下了一些内容
-            if (param.length() != 0) {
-                command.parameters = new String[]{param};
-            }else {
-                command.parameters = null;
-            }
-        }
+    private void analyzeCommandParam(Command command, char[] content, String sContent) {
+        int cmdNameLen = command.commandName.length();
+        int contentLen = content.length;
         //输入了一个无参命令
-        else if (command.commandName.length() == content.length()) {
-            command.parameters = null;
+        if (cmdNameLen == contentLen) command.parameters = null;
+        //无分隔符情况
+        else if (command.delimiter == null) {
+            String param = new String(content, cmdNameLen, contentLen - cmdNameLen);
+            command.parameters = new String[]{param};
         }
         //通过分隔符将参数取出赋给command对象
+        //输入可能为 commandName_XXX_XXX_XXX或commandName_
+        //分隔符为一个字符的按优化算法分割
+        else if (command.delimiter.length() == 1)
+            analyzeCommandParamBranch(command, content, cmdNameLen);
+        //分隔符长度大于1的按jdk提供的分割算法分割
+        else analyzeCommandParamBranch(command, sContent);
+    }
+
+    /**
+     * 解析命令参数的一个逻辑上的分支，专门处理 输入可能为 commandName_XXX_XXX_XXX或commandName_的情况
+     * @param command 要求分隔符长度最好为2或以上，因为对长度为1的分隔符提供了优化的分割算法
+     * @param content
+     */
+    public void analyzeCommandParamBranch(Command command, String content) {
+        String[] params = content.split(command.delimiter);
+        if (params.length == 1) command.parameters = null;
         else {
-            String[] params = content.split(command.delimiter);
-            if(params.length == 1) command.parameters = null;
-            else {
-                String[] realParams = new String[params.length - 1];
-                System.arraycopy(params, 1, realParams, 0, realParams.length);
-                command.parameters = realParams;
-            }
+            String[] realParams = new String[params.length - 1];
+            System.arraycopy(params, 1, realParams, 0, realParams.length);
+            command.parameters = realParams;
         }
+    }
+
+    /**
+     * 解析命令参数的一个逻辑上的分支，专门处理 输入可能为 commandName_XXX_XXX_XXX或commandName_的情况
+     * @param command 要求分隔符长度必须为1，这里针对jdk中的分割算法做了优化
+     * @param content
+     * @param cmdNameLen
+     */
+    public void analyzeCommandParamBranch(Command command, char[] content, int cmdNameLen) {
+        String[] params = CmdUtils.split(content, cmdNameLen + 1, command.delimiter.charAt(0));
+        if (params.length == 0) {
+            command.parameters = null;
+        }
+        else command.parameters = params;
+    }
+
+
+
+    /**
+     * 禁止父类函数对长度为1的分割符做转义操作
+     * @param delimiter
+     * @return 见父类注解
+     */
+    @Override
+    protected String reanalyseDelimiter(String delimiter) {
+        if (delimiter.length() == 1) {
+            return delimiter;
+        }
+        return super.reanalyseDelimiter(delimiter);
     }
 
     public void test() throws IllegalHandlingMethodException {
         addCommandToRootNode(new Command("apple"));
-        addCommandToRootNode(new Command("any"));
+        addCommandToRootNode(new Command("any",null));
         addCommandToRootNode(new Command("approach"));
         addCommandToRootNode(new Command("apply"));
         addCommandToRootNode(new Command("ant"));
@@ -211,6 +247,7 @@ public class FastAnalyzer extends CommandAnalyzer{
         addCommandToRootNode(new Command("approve"));
         addCommandToRootNode(new Command("applicate"));
         addCommandToRootNode(new Command("anyone"));
+        addCommandToRootNode(new Command("b"));
         realTreeHeight = calculateMaxTreeHeight(rootNode) - 1;
     }
 }

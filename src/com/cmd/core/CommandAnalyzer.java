@@ -95,9 +95,9 @@ public class CommandAnalyzer implements Analysable {
     //可以通过这个map按照首字母在commands中查找，提高效率，这个int[]记录了startIndex跟length两个值
     private Map<Character, int[]> commandsDirectory;
     //通过commandName去寻找对应的outline
-    private Map<String, String> outlineMap;
+    protected Map<String, String> outlineMap;
     //为了快速类型转换，通过type查找对应的转换动作
-    private Map<Class<?>,StringPraser> typesMap;
+    protected Map<Class<?>,StringPraser> typesMap;
 
     private static boolean keepDispatch = false;
 
@@ -108,7 +108,7 @@ public class CommandAnalyzer implements Analysable {
         if (commandAnalyzer == null) {
             synchronized (CommandAnalyzer.class) {
                 if (commandAnalyzer == null)
-                    commandAnalyzer = new CommandAnalyzer();
+                    commandAnalyzer = new CommandAnalyzer(true);
             }
         }
         return commandAnalyzer;
@@ -124,6 +124,15 @@ public class CommandAnalyzer implements Analysable {
         CommandAnalyzer analyzer = getInstance();
         analyzer.addHandlingObject(handlingObject);
         return analyzer;
+    }
+
+    protected CommandAnalyzer(boolean initCommandList) {
+        if (initCommandList) {
+            commands = new ArrayList<>();
+            commandsDirectory = new HashMap<>();
+        }
+        outlineMap = new TreeMap<>();
+        initTypesMap();
     }
 
     /**
@@ -175,13 +184,6 @@ public class CommandAnalyzer implements Analysable {
         keepDispatch = true;
     }
 
-    private CommandAnalyzer() {
-        commands = new ArrayList<>();
-        commandsDirectory = new HashMap<>();
-        outlineMap = new TreeMap<>();
-        initTypesMap();
-    }
-
     public void initTypesMap() {
         typesMap = new HashMap<>(14);
         typesMap.put(Boolean.class,(arg)->{
@@ -214,7 +216,7 @@ public class CommandAnalyzer implements Analysable {
      * @param method
      * @return 获取失败返回null
      */
-    private Command getCommandByMethod(Method method) {
+    protected Command getCommandByMethod(Method method) {
         Command command = null;
         String description = Description.DEFAULT_VALUE;
         //只有两种情况可以通过注解生成Command对象
@@ -223,8 +225,8 @@ public class CommandAnalyzer implements Analysable {
             CmdDef cmdDef = method.getAnnotation(CmdDef.class);
             //如果cmdDef.commandName()是默认值将使用函数名作为命令名
             String commandName = reanalyseCommandName(cmdDef.commandName(), method);
-            //如果分隔符是转义字符就给他转义
-            String delimiter = CmdUtils.characterEscape(cmdDef.delimiter());
+            //如果分隔符是转义字符就给他转义，如果是'null'就给他置空
+            String delimiter = reanalyseDelimiter(cmdDef.delimiter());
             command = new Command(commandName, delimiter);
             //如果cmdDef.description()是默认值则给description赋值函数名
             description = reanalyseDescription(cmdDef.description(), method);
@@ -237,9 +239,8 @@ public class CommandAnalyzer implements Analysable {
             String delimiter = " ";
             //如果存在方法上存在Delimiter注解，则delimiter为注解中的值
             if (method.isAnnotationPresent(Delimiter.class)) {
-                //如果分隔符是转义字符就给他转义
-                delimiter = method.getAnnotation(Delimiter.class).value();
-                delimiter = CmdUtils.characterEscape(delimiter);
+                //如果分隔符是转义字符就给他转义,如果是'null'就给他置空
+                delimiter = reanalyseDelimiter(method.getAnnotation(Delimiter.class).value());
             }
             command = new Command(commandName, delimiter);
             //如果存在方法上存在Description注解，则Description为注解中的值
@@ -285,6 +286,20 @@ public class CommandAnalyzer implements Analysable {
             description = CmdUtils.getMoreSimpleMethodSignature(method);
         }
         return description;
+    }
+
+    /**
+     * @param delimiter
+     * @return 对于从注解中获取的Description
+     *         如果是转义字符就给他转义
+     *         如果是内容是null返回空
+     */
+    protected String reanalyseDelimiter(String delimiter) {
+        if (delimiter.equals("null")) {
+            return null;
+        }
+        delimiter = CmdUtils.characterEscape(delimiter);
+        return delimiter;
     }
 
     /**
@@ -364,7 +379,7 @@ public class CommandAnalyzer implements Analysable {
         for (int i = info[0], len = info[1] + i; i < len; i++) {
             Command command = commands.get(i);
             //对于一参无分隔符命令特别处理
-            if (command.delimiter.equals("null") &&
+            if (command.delimiter == null &&
                     CmdUtils.isBeginWith(command.commandName, content, null)) {
                 String param = content.replaceFirst(command.commandName, "");
                 //如果拿掉commandName后留下了一些内容
@@ -382,7 +397,7 @@ public class CommandAnalyzer implements Analysable {
             //初始化参数个数
             String[] parameters = null;
             //如果有参数，求给定字符串中包含的参数个数
-            if (contentNew.length() > 1) {
+            if (contentNew.length() > command.delimiter.length()) {
                 contentNew = contentNew.replaceFirst(command.delimiter, "");
                 parameters = contentNew.split(command.delimiter);
                 command.parameters = parameters;

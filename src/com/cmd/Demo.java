@@ -1,5 +1,6 @@
 package com.cmd;
 
+import com.cmd.annotations.CmdDef;
 import com.cmd.annotations.CommandName;
 import com.cmd.annotations.Delimiter;
 import com.cmd.core.Command;
