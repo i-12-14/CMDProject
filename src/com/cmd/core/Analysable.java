@@ -1,6 +1,7 @@
 package com.cmd.core;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 实现此接口的类代表着拥有通过框架流程处理一条用户输入的能力
@@ -11,7 +12,7 @@ import java.util.List;
  * 其他方法用途见方法注释
  *
  * 
- * @version　2.0
+ * @version　2.4
  * @author congxiaoyao
  * @date 2016.1.24
  */
@@ -23,7 +24,7 @@ public interface Analysable {
 	 * @return 处理成功true 否则false
 	 */
 	boolean process(String content);
-	
+
 	/**
 	 * @return 命令的集合
 	 */
@@ -47,8 +48,9 @@ public interface Analysable {
 	 */
 	String getCommandInfo(String commandName);
 
-	/**
-	 * @return 处理函数的个数
+    /**
+     * 遍历Analysable对象中command
+     * @param consumer
      */
-	int getHandlingMethodSize();
+    void forEachCommand(Consumer<Command> consumer);
 }

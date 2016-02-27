@@ -6,6 +6,7 @@ import com.cmd.utils.CmdUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * 在这个类里解释一下这一整套所谓的框架的工作原理及使用方法
@@ -84,20 +85,20 @@ import java.util.*;
  * <p>
  * 我们提供了Outline注解用于阐明对于一个CommandName的总体性的概述，使用方式见类头注释
  *
- * @version 2.1
+ * @version 2.4
  * Created by congxiaoyao on 2016/2/19.
  */
 public class CommandAnalyzer implements Analysable {
 
     private static CommandAnalyzer commandAnalyzer;
 
-    private List<Command> commands;
+    protected List<Command> commands;
     //可以通过这个map按照首字母在commands中查找，提高效率，这个int[]记录了startIndex跟length两个值
     private Map<Character, int[]> commandsDirectory;
     //通过commandName去寻找对应的outline
     protected Map<String, String> outlineMap;
     //为了快速类型转换，通过type查找对应的转换动作
-    protected Map<Class<?>,StringPraser> typesMap;
+    protected Map<Class<?>,StringParser> typesMap;
 
     private static boolean keepDispatch = false;
 
@@ -226,7 +227,7 @@ public class CommandAnalyzer implements Analysable {
             //如果cmdDef.commandName()是默认值将使用函数名作为命令名
             String commandName = reanalyseCommandName(cmdDef.commandName(), method);
             //如果分隔符是转义字符就给他转义，如果是'null'就给他置空
-            String delimiter = reanalyseDelimiter(cmdDef.delimiter());
+            String delimiter = reanalyseDelimiter(cmdDef.delimiter(),method);
             command = new Command(commandName, delimiter);
             //如果cmdDef.description()是默认值则给description赋值函数名
             description = reanalyseDescription(cmdDef.description(), method);
@@ -240,7 +241,7 @@ public class CommandAnalyzer implements Analysable {
             //如果存在方法上存在Delimiter注解，则delimiter为注解中的值
             if (method.isAnnotationPresent(Delimiter.class)) {
                 //如果分隔符是转义字符就给他转义,如果是'null'就给他置空
-                delimiter = reanalyseDelimiter(method.getAnnotation(Delimiter.class).value());
+                delimiter = reanalyseDelimiter(method.getAnnotation(Delimiter.class).value(),method);
             }
             command = new Command(commandName, delimiter);
             //如果存在方法上存在Description注解，则Description为注解中的值
@@ -294,9 +295,21 @@ public class CommandAnalyzer implements Analysable {
      *         如果是转义字符就给他转义
      *         如果是内容是null返回空
      */
-    protected String reanalyseDelimiter(String delimiter) {
-        if (delimiter.equals("null")) {
-            return null;
+    protected String reanalyseDelimiter(String delimiter, Method method) {
+        try {
+            if (delimiter.length() == 0) {
+                throw new BadDefinitionException(BadDefinitionException.DECLARE_ERROR,
+                        method.toString());
+            }
+            if (delimiter.equals("null")) {
+                if (method.getParameterCount() > 1) {
+                    throw new BadDefinitionException(BadDefinitionException.DECLARE_ERROR,
+                            method.toString());
+                }
+                return null;
+            }
+        } catch (BadDefinitionException e) {
+            e.printStackTrace();
         }
         delimiter = CmdUtils.characterEscape(delimiter);
         return delimiter;
@@ -519,11 +532,11 @@ public class CommandAnalyzer implements Analysable {
      * @throws IllegalHandlingMethodException
      */
     private Object toType(String arg, Class<?> type) throws IllegalHandlingMethodException {
-        StringPraser praser = typesMap.get(type);
+        StringParser parser = typesMap.get(type);
         Object result = null;
-        if(praser == null) throw new IllegalHandlingMethodException();
+        if(parser == null) throw new IllegalHandlingMethodException();
         try {
-            result = praser.prase(arg);
+            result = parser.prase(arg);
         } catch (Exception e) {
             return null;
         }
@@ -570,7 +583,7 @@ public class CommandAnalyzer implements Analysable {
     @Override
     public String getCommandsDescription() {
         StringBuilder builder = new StringBuilder();
-        for (Command command : commands) {
+        forEachCommand((command -> {
             //准备一下关于这条命令的帮助信息
             String description = "too much..";
             List<HandlingMethod> handlingMethods = command.getHandlingMethods();
@@ -590,7 +603,7 @@ public class CommandAnalyzer implements Analysable {
 //            builder.append(command.commandName.length() < 4 ? "\t" : "");
             builder.append(description);
             builder.append('\n');
-        }
+        }));
         builder.delete(builder.length() - 1, builder.length());
         return builder.toString();
     }
@@ -598,8 +611,8 @@ public class CommandAnalyzer implements Analysable {
     @Override
     public String getCommandInfo(String commandName) {
         StringBuilder builder = new StringBuilder();
-        for (Command command : commands) {
-            if (!command.commandName.equals(commandName)) continue;
+        forEachCommand((command -> {
+            if (!command.commandName.equals(commandName)) return;
             builder.append("commandName-->").append(command.commandName).append('\n');
             builder.append("delimiter-->").append(command.delimiter).append('\n');
             String outline = outlineMap.get(commandName);
@@ -619,19 +632,17 @@ public class CommandAnalyzer implements Analysable {
                     builder.append('\n');
                 }
             }
-        }
+        }));
         if (builder.length() == 0) return "";
         builder.delete(builder.length() - 1, builder.length());
         return builder.toString();
     }
 
     @Override
-    public int getHandlingMethodSize() {
-        int size = 0;
+    public void forEachCommand(Consumer<Command> consumer) {
         for (Command command : commands) {
-            size += command.getHandlingMethods().size();
+            consumer.accept(command);
         }
-        return size;
     }
 
     public String getOutLine(String commandName) {

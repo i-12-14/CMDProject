@@ -1,10 +1,7 @@
 package com.cmd.handler;
 
 import com.cmd.annotations.CmdDef;
-import com.cmd.core.Command;
-import com.cmd.core.CommandAnalyzer;
-import com.cmd.core.HandlingMethod;
-import com.cmd.core.NoneHandlingMethodException;
+import com.cmd.core.*;
 import com.cmd.utils.DynamicClassLoader;
 
 import javax.tools.JavaCompiler;
@@ -30,6 +27,10 @@ public class DynamicCommandHandler extends BaseHandler {
     static final String CLASS_PATH = new File("bin").getAbsolutePath();
     //存放源文件的根文件夹
     static final String SRC_PATH = new File("src").getAbsolutePath();
+
+    public DynamicCommandHandler(Analysable analysable) {
+        super(analysable);
+    }
 
     @CmdDef(commandName = "addho",description = "添加一个处理类 请输入类的全名")
     public static void addHandlingObject(String className) {

@@ -4,9 +4,25 @@ import com.cmd.annotations.Outline;
 import com.cmd.utils.CmdUtils;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 /**
+ * 比CommandAnalyzer性能更好的命令解析器，针对命令匹配、字串分割做了额外的优化
+ * 不同于CommandAnalyzer，FastAnalyzer建立了多级索引(一棵搜索树)，对于每一层的索引，
+ * 使用二分搜索做查找，使得在命令定义比较密集的情况下查找效率比CommandAnalyzer高三到四倍
+ * 同时对内存的消耗也比使用hashMap低得多，兼顾性能与内存消耗<p>
+ * FastAnalyzer针对一种特定情况对字符串分割做出了优化，当命令使用一个字符作为分隔符时
+ * FastAnalyzer对字串的分割效率理想状态下能达到jdk给出的分割算法的三到四倍(大部分命令的分隔符都是单字符的)
+ * 所以，两部分结合起来，在分析阶段性能的提升是显著的，但无可避免的在其他方面做出了妥协<p>
+ * 由于使用树来管理command对象，所以无法实现Analysable接口的getCommands方法，这是框架设计上的一个失误
+ * 由于使用树来管理command对象，导致其在内存上的消耗一定是比CommandAnalyzer要高很多的<p>
+ *
+ * 在框架设计之初，没有考虑到会走到今天这一步，所以使得FastAnalyzer与Analysable接口有些许的不兼容
+ * 可能会导致某些额外功能的不稳定 如代码提示器或各种handler，今后的版本将着力修复
+ *
+ * @version 2.4
  * Created by congxiaoyao on 2016/2/25.
  */
 public class FastAnalyzer extends CommandAnalyzer{
@@ -42,11 +58,53 @@ public class FastAnalyzer extends CommandAnalyzer{
         return analyzer;
     }
 
+    /**
+     * 构造函数，给父类的构造函数传参false，即不使用父类的命令集合来维护command对象
+     * FastAnalyzer使用树的结构来维护所有的command从而提高查找效率
+     */
     private FastAnalyzer() {
         super(false);
         rootNode = new Node('\0');
         outlineMap = new TreeMap<>();
         initTypesMap();
+    }
+
+    /**
+     * 覆写父类维护command对象的方式，将解析出来的 command对象放入搜索树中
+     * @param handlingObject 包含处理函数的对象
+     * @return
+     */
+    @Override
+    public CommandAnalyzer addHandlingObject(Object handlingObject) {
+        Method[] methods = handlingObject.getClass().getDeclaredMethods();
+        for (Method method : methods) {
+            //尝试根据method上的注解生成Command对象
+            Command temp = getCommandByMethod(method);
+            if (temp == null) continue;
+            //赋值invoker以便反射调用
+            temp.getHandlingMethods().get(0).invoker = handlingObject;
+            //将command对象添加到搜索树中
+            try {
+                addCommandToRootNode(temp);
+                int cmdNameLen = temp.commandName.length();
+                if (cmdNameLen > realTreeHeight) {
+                    realTreeHeight = cmdNameLen;
+                }
+            } catch (IllegalHandlingMethodException e) {
+                e.printStackTrace();
+            }
+        }
+        //按OnlyCare个数给每个command里的handlingMethods排序
+        sortHandlingMethods();
+        //添加outline
+        if (!handlingObject.getClass().isAnnotationPresent(Outline.class)) return this;
+        Outline outline = handlingObject.getClass().getAnnotation(Outline.class);
+        String[] commandNames = outline.commandNames();
+        String[] outlines = outline.outlines();
+        for (int i = 0; i < commandNames.length; i++) {
+            outlineMap.put(commandNames[i], outlines[i]);
+        }
+        return this;
     }
 
     /**
@@ -68,44 +126,13 @@ public class FastAnalyzer extends CommandAnalyzer{
         //如果node中能找到相同的command 就只添加handlingMethod
         Command[] commands = node.commands;
         for (Command existed : commands) {
-            if (existed.parameters.equals(command.parameters)) {
+            if(existed.isDelimiterEquals(command.delimiter)){
                 existed.addHandlingMethod(command.getHandlingMethods().get(0));
                 return;
             }
         }
         //如果找不到就直接添加进去
         node.addCommand(command);
-    }
-
-    @Override
-    public CommandAnalyzer addHandlingObject(Object handlingObject) {
-        Method[] methods = handlingObject.getClass().getDeclaredMethods();
-        for (Method method : methods) {
-            //尝试根据method上的注解生成Command对象
-            Command temp = getCommandByMethod(method);
-            if (temp == null) continue;
-            //赋值invoker以便反射调用
-            temp.getHandlingMethods().get(0).invoker = handlingObject;
-            //将command对象添加到搜索树中
-            try {
-                addCommandToRootNode(temp);
-            } catch (IllegalHandlingMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        //计算生成树的高度,不包括rootNode那一层的节点
-        realTreeHeight = calculateMaxTreeHeight(rootNode) - 1;
-        //按OnlyCare个数给每个command里的handlingMethods排序
-        sortHandlingMethods();
-        //添加outline
-        if (!handlingObject.getClass().isAnnotationPresent(Outline.class)) return this;
-        Outline outline = handlingObject.getClass().getAnnotation(Outline.class);
-        String[] commandNames = outline.commandNames();
-        String[] outlines = outline.outlines();
-        for (int i = 0; i < commandNames.length; i++) {
-            outlineMap.put(commandNames[i], outlines[i]);
-        }
-        return this;
     }
     /**
      * 对于类内维护的查找树中的所有的command，对其维护的HandlingMethods按OnlyCare数量排序
@@ -129,22 +156,32 @@ public class FastAnalyzer extends CommandAnalyzer{
         return max[0] + 1;
     }
 
+    /**
+     * 通过FastAnalyzer维护的搜索树来查找相应的命令并解析
+     * @param content 用户提交的字符串
+     * @return
+     */
     @Override
     public Command analyze(String content) {
+        //计算实际需要分析的字符串的长度
         int len = content.length() > realTreeHeight ? realTreeHeight : content.length();
         char[] inputs = content.toCharArray();
         int nowIndex = -1;
-        Node finder = new Node('\0');
+        Node finder = new Node(rootNode.c);
         Node nowNode = rootNode;
         for (int i = 0; i < len; i++) {
             finder.c = inputs[i];
+            //如果没有下一层，说明没有匹配到命令
             if(nowNode.nextLayer == null) return null;
             nowNode = nowNode.findNodeInNextLayer(finder);
+            //如果下一层中没想要的东西 说明没匹配到
             if(nowNode == null) return null;
             nowIndex++;
             Command[] commands = nowNode.commands;
             if (nowNode.commands == null) continue;
+            //在当前的node中保存有command对象，尝试匹配下看看是不是用户输入的这条
             for (Command command : commands) {
+                //如果是用户输入的，可以继续去分析具体输入的参数了
                 if (isDelimiterMatch(command.delimiter, content, nowIndex+1)) {
                     analyzeCommandParam(command, inputs, content);
                     return command;
@@ -170,7 +207,7 @@ public class FastAnalyzer extends CommandAnalyzer{
     }
 
     /**
-     * 已经决定用户输入content是命令command，但在要根据command中的分隔符信息从content中解析出参数来
+     * 已经确定用户输入content是命令command，现在要根据command中的分隔符信息从content中解析出参数来
      * @param command
      * @param content
      */
@@ -222,32 +259,50 @@ public class FastAnalyzer extends CommandAnalyzer{
         else command.parameters = params;
     }
 
-
-
     /**
      * 禁止父类函数对长度为1的分割符做转义操作
      * @param delimiter
      * @return 见父类注解
      */
     @Override
-    protected String reanalyseDelimiter(String delimiter) {
+    protected String reanalyseDelimiter(String delimiter, Method method) {
         if (delimiter.length() == 1) {
             return delimiter;
         }
-        return super.reanalyseDelimiter(delimiter);
+        return super.reanalyseDelimiter(delimiter,method);
     }
 
-    public void test() throws IllegalHandlingMethodException {
-        addCommandToRootNode(new Command("apple"));
-        addCommandToRootNode(new Command("any",null));
-        addCommandToRootNode(new Command("approach"));
-        addCommandToRootNode(new Command("apply"));
-        addCommandToRootNode(new Command("ant"));
-        addCommandToRootNode(new Command("aplet"));
-        addCommandToRootNode(new Command("approve"));
-        addCommandToRootNode(new Command("applicate"));
-        addCommandToRootNode(new Command("anyone"));
-        addCommandToRootNode(new Command("b"));
-        realTreeHeight = calculateMaxTreeHeight(rootNode) - 1;
+    @Override
+    public void forEachCommand(Consumer<Command> consumer) {
+        rootNode.iterateChild(consumer);
+    }
+
+    @Override
+    public void removeCommand(Command command) {
+        char[] chars = command.commandName.toCharArray();
+        Node finder = new Node(rootNode.c);
+        Node nowNode = rootNode;
+        for (char c : chars) {
+            finder.c = c;
+            nowNode = nowNode.findNodeInNextLayer(finder);
+            if (nowNode == null) {
+                return;
+            }
+        }
+        Command[] commands = nowNode.commands;
+        if (commands == null) return;
+        for (int i = 0; i < commands.length; i++) {
+            Command existed = commands[i];
+            if (existed.isDelimiterEquals(command.delimiter)) {
+                nowNode.removeCommand(i);
+                return;
+            }
+        }
+    }
+
+    @Deprecated
+    @Override
+    public List<Command> getCommands() {
+        return null;
     }
 }

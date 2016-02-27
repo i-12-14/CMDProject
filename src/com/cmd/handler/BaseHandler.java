@@ -15,8 +15,14 @@ import java.util.List;
  */
 public class BaseHandler {
 
+    private static Analysable analysable;
+
+    public BaseHandler(Analysable analysable) {
+        this.analysable = analysable;
+    }
+
     protected static Analysable getAnalysable() {
-        return CommandAnalyzer.getInstance();
+        return analysable;
     }
 
     public static List<Command> getCommands() {

@@ -3,6 +3,7 @@ package com.cmd.handler;
 import com.cmd.annotations.CommandName;
 import com.cmd.annotations.OnlyCare;
 import com.cmd.annotations.Outline;
+import com.cmd.core.Analysable;
 import com.cmd.core.Command;
 
 import java.util.HashSet;
@@ -18,6 +19,10 @@ import java.util.Set;
 
 @Outline(commandNames = "help", outlines = "帮助信息")
 public class HelpHandler extends BaseHandler {
+
+    public HelpHandler(Analysable analysable) {
+        super(analysable);
+    }
 
     /**
      * 输出帮助信息
@@ -50,11 +55,8 @@ public class HelpHandler extends BaseHandler {
     @OnlyCare("-all")
     public void showAllCommandInfo() {
         StringBuilder builder = new StringBuilder("\5");
-        List<Command> commands = getAnalysable().getCommands();
-        Set<String> commandNames = new HashSet<>(commands.size());
-        for (Command command : commands) {
-            commandNames.add(command.commandName);
-        }
+        Set<String> commandNames = new HashSet<>();
+        getAnalysable().forEachCommand(command -> commandNames.add(command.commandName));
         for (String string : commandNames) {
             builder.append(getAnalysable().getCommandInfo(string));
         }

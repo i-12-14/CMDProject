@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import com.cmd.annotations.CommandName;
 import com.cmd.annotations.OnlyCare;
 import com.cmd.annotations.Outline;
+import com.cmd.core.Analysable;
 import com.cmd.extras.CodeAssistant;
 import com.cmd.extras.CommandWindow;
 
@@ -36,7 +37,8 @@ public class CommandWindowHandler extends BaseHandler {
 	
 	private CommandWindow window;
 
-	public CommandWindowHandler(CommandWindow window) {
+	public CommandWindowHandler(CommandWindow window, Analysable analysable) {
+		super(analysable);
 		this.window = window;
 	}
 

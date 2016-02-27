@@ -78,6 +78,28 @@ public class Node implements Comparable<Node> {
     }
 
     /**
+     * 删除这个节点上保存的command数组中索引为index的对象
+     * @param index
+     */
+    public void removeCommand(int index) {
+        if (commands == null) return;
+        int len = commands.length;
+        if (index >= len) return;
+        if (len == 1) {
+            commands = null;
+            return;
+        }
+        Command[] newCommands = new Command[len - 1];
+        for (int i = 0, j = 0; i < len; i++) {
+            if (i != index) {
+                newCommands[j] = commands[i];
+                j++;
+            }
+        }
+        commands = newCommands;
+    }
+
+    /**
      * @param node
      * @return 去nextLayer中寻找参数节点，没有返回null
      */

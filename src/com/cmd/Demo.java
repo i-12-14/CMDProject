@@ -1,8 +1,6 @@
 package com.cmd;
 
-import com.cmd.annotations.CmdDef;
 import com.cmd.annotations.CommandName;
-import com.cmd.annotations.Delimiter;
 import com.cmd.core.Command;
 import com.cmd.core.CommandAnalyzer;
 import com.cmd.extras.CommandWindow;
@@ -23,9 +21,9 @@ public class Demo {
 
         //绑定命令的处理函数所在的类的实例，可以是多个
         analyzer = CommandAnalyzer.handleWith(new Demo());
-        analyzer.addHandlingObject(new DynamicCommandHandler());
-        analyzer.addHandlingObject(new HelpHandler());
-        analyzer.addHandlingObject(new CommandWindowHandler(window));
+        analyzer.addHandlingObject(new DynamicCommandHandler(analyzer));
+        analyzer.addHandlingObject(new HelpHandler(analyzer));
+        analyzer.addHandlingObject(new CommandWindowHandler(window,analyzer));
 
         analyzer.process("welcome");
         analyzer.removeCommand(new Command("welcome"));
