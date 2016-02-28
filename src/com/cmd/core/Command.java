@@ -10,7 +10,7 @@ import java.util.List;
  * Command中保存了处理这条命令的处理函数的集合，以便CommandAnalyzer分析调用
  *
  * @author congxiaoyao
- * @version 2.4
+ * @version 2.0
  * @date 2016.1.19
  */
 

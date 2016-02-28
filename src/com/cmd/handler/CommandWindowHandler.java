@@ -148,7 +148,7 @@ public class CommandWindowHandler extends BaseHandler {
 	@CommandName("ecc")
 	public void enableCodeCompletion(boolean enable) {
 		if (enable) {
-			window.setAssistant(new CodeAssistant(getAnalysable().getCommands()));
+			window.setAssistant(new CodeAssistant(getAnalysable()));
 		}else {
 			window.setAssistant(null);
 		}

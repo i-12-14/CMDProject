@@ -1,5 +1,6 @@
 package com.cmd.extras;
 
+import com.cmd.core.Analysable;
 import com.cmd.core.Command;
 import com.cmd.core.HandlingMethod;
 import com.cmd.utils.QuickSort;
@@ -7,6 +8,7 @@ import com.cmd.utils.SelectableArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,8 +40,8 @@ public class CodeAssistant {
         quickSort = initQuickSort();
     }
 
-	public CodeAssistant(List<Command> commands) {
-    	this(commandsToCodesX(commands));
+	public CodeAssistant(Analysable analysable) {
+    	this(commandsToCodesX(analysable));
     }
 
 	/**
@@ -167,27 +169,23 @@ public class CodeAssistant {
 		return Arrays.copyOf(codes, newLength);
     }
 
-    public static String[] commandsToCodesX(List<Command> commands) {
-        List<String> list = getOnlyCareList(commands);
-        int n = list.size();
-        int m = commands.size();
-        String[] codes = new String[m+n];
-        for(int i=0;i<m;i++) {
-            String code = commands.get(i).commandName;
-            codes[i] = code;
+    public static String[] commandsToCodesX(Analysable analysable) {
+        List<String> list = getOnlyCareList(analysable);
+        List<String> codes = new ArrayList<>(list.size());
+        for (String s : list) {
+            codes.add(s);
         }
-        for (int i = m; i <m+n ; i++) {
-            String code =list.get(i-m);
-            codes[i] = code;
-        }
-        return codes;
+        analysable.forEachCommand(command -> {
+            String code = command.commandName;
+            codes.add(code);
+        });
+        String[] result = new String[codes.size()];
+        return codes.toArray(result);
     }
 
-    public static List<String> getOnlyCareList(List<Command> commands) {
+    public static List<String> getOnlyCareList(Analysable analysable) {
         List<String> sList = new ArrayList<>();
-        int n = commands.size();
-        for (int i = 0; i < n; i++) {
-            Command command = commands.get(i);
+        analysable.forEachCommand((command -> {
             List<HandlingMethod> hList = command.getHandlingMethods();
             int m = hList.size();
             for (int j = 0; j < m; j++) {
@@ -204,10 +202,9 @@ public class CodeAssistant {
                 sList.add(temp);
 
             }
-        }
+        }));
         return sList;
     }
-
 
 /**
      * 带权值的String，对于任意一个code，其与用户输入的匹配度将记录在这个类的对象的weight字段，code在string字段

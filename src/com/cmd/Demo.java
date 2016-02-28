@@ -2,7 +2,7 @@ package com.cmd;
 
 import com.cmd.annotations.CommandName;
 import com.cmd.core.Command;
-import com.cmd.core.CommandAnalyzer;
+import com.cmd.core.FastAnalyzer;
 import com.cmd.extras.CommandWindow;
 import com.cmd.handler.CommandWindowHandler;
 import com.cmd.handler.DynamicCommandHandler;
@@ -10,7 +10,7 @@ import com.cmd.handler.HelpHandler;
 
 public class Demo {
 
-	private static CommandAnalyzer analyzer;
+	private static FastAnalyzer analyzer;
 	private static CommandWindow window;
 
     public static void main(String[] args) {
@@ -20,7 +20,7 @@ public class Demo {
         window.setOnSubmitListener((content -> System.out.println(analyzer.process(content))));
 
         //绑定命令的处理函数所在的类的实例，可以是多个
-        analyzer = CommandAnalyzer.handleWith(new Demo());
+        analyzer = FastAnalyzer.handleWith(new Demo());
         analyzer.addHandlingObject(new DynamicCommandHandler(analyzer));
         analyzer.addHandlingObject(new HelpHandler(analyzer));
         analyzer.addHandlingObject(new CommandWindowHandler(window,analyzer));

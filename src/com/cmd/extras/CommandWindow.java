@@ -309,11 +309,15 @@ public class CommandWindow extends JFrame{
 			printlnSmoothly(string.substring(1, len));
 		}
 		else if(len != 0 && string.charAt(len-1) == '\4') {
-			textArea.append(string.substring(0, len-1));
-			textArea.append(LFHINT);
+            synchronized (textArea) {
+                textArea.append(string.substring(0, len-1));
+                textArea.append(LFHINT);
+            }
 		}else {
-			textArea.append(string);
-			textArea.append("\n");
+            synchronized (textArea) {
+                textArea.append(string);
+                textArea.append("\n");
+            }
 		}
 		moveCaretToBottom();
 	}
@@ -326,30 +330,31 @@ public class CommandWindow extends JFrame{
 	private boolean can = true;
 	public void printlnSmoothly(String string) {
 		if(string == null) return;
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					textArea.getDocument().remove(getTextLength()-HINT.length(), HINT.length());
-				} catch (BadLocationException e1) {
-					e1.printStackTrace();
-				}
-				BufferedReader reader = new BufferedReader(new StringReader(string));
-				String line = null;
-				try {
-					can =false;
-					while((line = reader.readLine()) != null) {
-						System.out.println(line);
-						Thread.sleep(5);
-					}
-					can = true;
-					reader.close();
-					textArea.append(HINT);
-					moveCaretToBottom();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+		new Thread(()->{
+            try {
+                synchronized (textArea) {
+                    textArea.getDocument().remove(getTextLength()-HINT.length(), HINT.length());
+                }
+            } catch (BadLocationException e1) {
+                e1.printStackTrace();
+            }
+            BufferedReader reader = new BufferedReader(new StringReader(string));
+            String line = null;
+            try {
+                can =false;
+                while((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                    Thread.sleep(5);
+                }
+                can = true;
+                reader.close();
+                synchronized (textArea) {
+                    textArea.append(HINT);
+                }
+                moveCaretToBottom();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 		}).start();
 	}
 	

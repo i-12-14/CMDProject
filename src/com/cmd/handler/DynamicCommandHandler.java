@@ -38,7 +38,14 @@ public class DynamicCommandHandler extends BaseHandler {
                 (DynamicClassLoader.class.getClassLoader());
         try {
             Object handlingObject = classLoader.loadClass(CLASS_PATH, className).newInstance();
-            CommandAnalyzer.handleWith(handlingObject);
+            if (getAnalysable().getClass() == CommandAnalyzer.class) {
+                CommandAnalyzer.handleWith(handlingObject);
+            } else if (getAnalysable().getClass() == FastAnalyzer.class) {
+                FastAnalyzer.handleWith(handlingObject);
+            } else {
+                System.out.println("处理失败");
+                return;
+            }
         } catch (InstantiationException |
                 IllegalAccessException  | ClassNotFoundException e) {
             e.printStackTrace();
@@ -48,14 +55,13 @@ public class DynamicCommandHandler extends BaseHandler {
 
     @CmdDef(commandName = "delcmd", description = "删除命令及其处理函数 请输入命令名")
     public static void removeCommandByName(String commandName) {
-        List<Command> commands = getCommands();
         List<Command> removeList = new ArrayList<>();
-        for (Command command : commands) {
+        getAnalysable().forEachCommand((command ->{
             if (command.commandName.equals(commandName)) {
                 removeList.add(new Command(
                         new String(command.commandName),new String(command.delimiter)));
             }
-        }
+        }));
         for (Command command : removeList) {
             getAnalysable().removeCommand(command);
         }
@@ -64,8 +70,7 @@ public class DynamicCommandHandler extends BaseHandler {
 
     @CmdDef(commandName = "delhm", description = "删除一个处理函数 请输入完整函数签名",delimiter = "null")
     public static void removeHandlingMethod(String signature) {
-        List<Command> commands = getCommands();
-        for (Command command : commands) {
+        getAnalysable().forEachCommand(command -> {
             List<HandlingMethod> handlingMethods = command.getHandlingMethods();
             Iterator<HandlingMethod> iterator = handlingMethods.iterator();
             while (iterator.hasNext()) {
@@ -77,14 +82,13 @@ public class DynamicCommandHandler extends BaseHandler {
             if (handlingMethods.isEmpty()) {
                 System.out.print(NoneHandlingMethodException.MSG);
             }
-        }
+        });
         System.out.println("处理完毕");
     }
 
     @CmdDef(commandName = "delho", description = "删除一个处理类 请输入类的全名")
     public static void removeHandlingObject(String className) {
-        List<Command> commands = getCommands();
-        for (Command command : commands) {
+        getAnalysable().forEachCommand(command -> {
             List<HandlingMethod> handlingMethods = command.getHandlingMethods();
             Iterator<HandlingMethod> iterator = handlingMethods.iterator();
             while (iterator.hasNext()) {
@@ -96,7 +100,7 @@ public class DynamicCommandHandler extends BaseHandler {
             if (handlingMethods.isEmpty()) {
                 System.out.print(NoneHandlingMethodException.MSG);
             }
-        }
+        });
     }
 
     @CmdDef(commandName = "reload",description = "重新加载处理类 请输入类的全名")
