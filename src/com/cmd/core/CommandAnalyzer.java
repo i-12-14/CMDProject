@@ -1,12 +1,21 @@
 package com.cmd.core;
 
-import com.cmd.annotations.*;
-import com.cmd.utils.CmdUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
+
+import com.cmd.annotations.CmdDef;
+import com.cmd.annotations.CommandName;
+import com.cmd.annotations.Delimiter;
+import com.cmd.annotations.Description;
+import com.cmd.annotations.Outline;
+import com.cmd.utils.CmdUtils;
 
 /**
  * 在这个类里解释一下这一整套所谓的框架的工作原理及使用方法
@@ -49,6 +58,7 @@ import java.util.function.Consumer;
  * <p>关于重载命令</p>
  * 由一个命令名及一个分隔符可以唯一确定一条命令，所以命令支持分隔符重载
  * 同时命令支持不同参数个数的重载，对于同一个命令，可以绑定很多不同参数个数的处理函数
+ * 当然对于同一个命令名同一个参数个数处的理函数，也可以定义多个，但不保证哪一个会被调用
  *
  * <p>关于可变参数特性</p>
  * 可变参数特性是指在处理函数定义的时候并不关心准确的参数个数，任意的参数个数我都希望去处理，这时
@@ -56,13 +66,13 @@ import java.util.function.Consumer;
  *
  * <p>关于OnlyCare</p>
  * 对于有参命令，我们可能仅仅关心某个参数中的某个特定值，通常下我们会通过分支语句来拦截这些特定值
- * 但我们可以通过OnlyCare注解来帮我们拦截敏感参数，他可以被注解在处理函数上或处理函数的参数前
+ * 但框架提供了OnlyCare注解来帮我们拦截敏感参数，他可以被注解在处理函数上或处理函数的参数前
  * 想要了解详细的使用方法详见{@code OnlyCare}类内注释
  * 需要说明的是，假设同时存在两个处理相同命令且参数个数相同的处理函数，其中一个带有OnlyCare注解，另一个不带，
  * CommandAnalyzer会优先尝试调用带有OnlyCare注解的处理函数
  *
  * <p>关于自动参数类型转换</p>
- * 一般来说，我们必须将处理函数的参数定义为String类型的
+ * 一般来说，我们尽可能的将处理函数的参数定义为String类型的
  * 但是如果命令中的参数是基本数据类型的一种 如两整数相加的命令，两个参数的类型实际是int型的
  * 那么允许将处理函数的参数类型定义为int或Integer类型，CommandAnalyzer会自动将String类型的参数转为int/Integer型
  *
@@ -75,7 +85,7 @@ import java.util.function.Consumer;
  * 支持命令的动态删除，可以通过代码甚至是命令删除一条命令见{@code CommandAnalyzer#removeCommand(Command)}
  * 支持命令及处理函数的动态添加，通过{@code DynamicClassLoader}实现了class文件的热加载
  * 动态特性使得程序运行起来之后仍然可以动态的添加、删除命令甚至可以改变命令的处理方式
- * 这里只是留下关于动态特性的想象空间，并没有提供实际的接口，但理论上是完全可行的
+ * 详见handler包内的DynamicCommandHandler
  *
  * <p>其他</p>
  * 一般情况下命令是必须有分隔符的，即使不使用注解去标明，也会存在默认分隔符空格
@@ -84,6 +94,12 @@ import java.util.function.Consumer;
  * 如<code>@Description("null")</code>或<code>@CmdDef(description = "null")</code>
  * <p>
  * 我们提供了Outline注解用于阐明对于一个CommandName的总体性的概述，使用方式见类头注释
+ * <p>
+ * 一般来说CommandAnalyzer找到了一个能够处理一条命令的处理函数后，就不会继续去尝试调用其他的处理函数了
+ * 但如果你有特殊的需求希望调用完一个处理函数后继续寻找其他可能存在的处理函数并调用，请在处理函数中
+ * 调用{@code CommandAnalyzer#keepDispatch()}方法
+ * <p>
+ * 对于无参命令，请谨慎重载分隔符，请尽量避免在长度大于一的分隔符中出现转义字符
  *
  * @version 2.4
  * Created by congxiaoyao on 2016/2/19.
@@ -197,18 +213,20 @@ public class CommandAnalyzer implements Analysable {
             else if (arg.equals("false")) return false;
             else return null;
         });
-        typesMap.put(Integer.class,(arg) -> Integer.parseInt(arg));
-        typesMap.put(int.class,(arg) ->     Integer.parseInt(arg));
-        typesMap.put(Double.class,(arg) -> Double.parseDouble(arg));
-        typesMap.put(double.class,(arg) -> Double.parseDouble(arg));
-        typesMap.put(Byte.class,(arg) -> Byte.parseByte(arg));
-        typesMap.put(byte.class,(arg) -> Byte.parseByte(arg));
-        typesMap.put(Float.class,(arg) -> Float.parseFloat(arg));
-        typesMap.put(float.class,(arg) -> Float.parseFloat(arg));
-        typesMap.put(Short.class,(arg) -> Short.parseShort(arg));
-        typesMap.put(short.class,(arg) -> Short.parseShort(arg));
-        typesMap.put(Long.class,(arg) -> Long.parseLong(arg));
-        typesMap.put(String.class, (arg) -> arg);
+        typesMap.put(Character.class,(arg)-> arg.charAt(0));
+        typesMap.put(char.class,(arg) 	->  arg.charAt(0));
+        typesMap.put(Integer.class,(arg)->  Integer.parseInt(arg));
+        typesMap.put(int.class,(arg) 	->  Integer.parseInt(arg));
+        typesMap.put(Double.class,(arg) -> 	Double.parseDouble(arg));
+        typesMap.put(double.class,(arg) ->	Double.parseDouble(arg));
+        typesMap.put(Byte.class,(arg) 	-> 	Byte.parseByte(arg));
+        typesMap.put(byte.class,(arg) 	-> 	Byte.parseByte(arg));
+        typesMap.put(Float.class,(arg) 	-> 	Float.parseFloat(arg));
+        typesMap.put(float.class,(arg) 	-> 	Float.parseFloat(arg));
+        typesMap.put(Short.class,(arg) 	-> 	Short.parseShort(arg));
+        typesMap.put(short.class,(arg) 	-> 	Short.parseShort(arg));
+        typesMap.put(Long.class,(arg) 	-> 	Long.parseLong(arg));
+        typesMap.put(String.class, (arg)->  arg);
     }
 
     /**
@@ -254,6 +272,15 @@ public class CommandAnalyzer implements Analysable {
         //其他情况将不被认为能解析出命令
         else return null;
         try {
+            if (command.delimiter != null && command.delimiter.length() > 2) {
+                char[] delim = command.delimiter.toCharArray();
+                for (char c : delim) {
+                    if (c == '\\') {
+                        throw new BadDefinitionException("非法分隔符" + command.delimiter + "\n" +
+                                        BadDefinitionException.ERROR,method.toString());
+                    }
+                }
+            }
             //由这个method对象生成handlingMethod
             HandlingMethod handlingMethod = new HandlingMethod(method);
             handlingMethod.setDescription(description);

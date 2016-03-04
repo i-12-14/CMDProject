@@ -17,11 +17,11 @@ public class BadDefinitionException extends Exception {
 
 	private static final long serialVersionUID = 5446979037535382391L;
 
-	private static final String ERROR = "your definition is illegal\n";
+	public static final String ERROR = "your definition is illegal at ";
 
-    public static final String ONLYCARE_ERROR = "OnlyCare inject error at\n";
+    public static final String ONLYCARE_ERROR = "OnlyCare inject error at ";
 
-    public static final String DECLARE_ERROR = "Command inject error at\n";
+    public static final String DECLARE_ERROR = "Command inject error at ";
 
     public BadDefinitionException() {
         super(ERROR);

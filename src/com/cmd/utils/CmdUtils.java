@@ -26,25 +26,25 @@ public class CmdUtils {
 
     /**
      * 分析这个String是否为ec数组中所包含的待转义的字符，如果是就给他转义喽
-     * @param ch 待检查String
+     * @param content 待检查String
      * @return 转义后的ch
      */
-    public static String characterEscape(String ch) {
+    public static String characterEscape(String content) {
         for (String string : ec) {
-            if(string.equals(ch)) {
-                ch = "\\"+string;
+        	if(content.contains(string)) {
+        		content = content.replace(string, "\\"+string);
                 break;
-            }
+        	}
         }
-        return ch;
+        return content;
     }
 
     /**
      * 基本数据类型 这里包括String型了
      */
     public static Class<?>[] baseTypes = {byte.class, Byte.class, short.class, Short.class,
-            int.class, Integer.class, long.class, Long.class, float.class, Float.class,
-            double.class, Double.class, boolean.class, Boolean.class, String.class};
+            int.class, Integer.class, long.class, Long.class, float.class, Float.class,char.class, 
+            Character.class, double.class, Double.class, boolean.class, Boolean.class, String.class};
 
     /**
      * @param type

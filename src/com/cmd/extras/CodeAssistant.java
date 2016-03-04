@@ -1,15 +1,14 @@
 package com.cmd.extras;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.cmd.core.Analysable;
 import com.cmd.core.Command;
 import com.cmd.core.HandlingMethod;
 import com.cmd.utils.QuickSort;
 import com.cmd.utils.SelectableArray;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * 代码提示器，功能简陋，可有可无

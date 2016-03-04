@@ -1,14 +1,12 @@
 package com.cmd.handler;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.cmd.annotations.CommandName;
 import com.cmd.annotations.OnlyCare;
 import com.cmd.annotations.Outline;
 import com.cmd.core.Analysable;
-import com.cmd.core.Command;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * 基于Analysable的getCommandsDescription、getCommandInfo方法提供帮助命令

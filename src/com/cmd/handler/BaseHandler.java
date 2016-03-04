@@ -1,10 +1,9 @@
 package com.cmd.handler;
 
+import java.util.List;
+
 import com.cmd.core.Analysable;
 import com.cmd.core.Command;
-import com.cmd.core.CommandAnalyzer;
-
-import java.util.List;
 
 /**
  * 统一handler的标准为所有子handler提供getAnalysable方法
@@ -18,7 +17,7 @@ public class BaseHandler {
     private static Analysable analysable;
 
     public BaseHandler(Analysable analysable) {
-        this.analysable = analysable;
+        BaseHandler.analysable = analysable;
     }
 
     protected static Analysable getAnalysable() {

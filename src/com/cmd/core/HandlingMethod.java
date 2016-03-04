@@ -97,17 +97,25 @@ public class HandlingMethod {
     private void checkDefinitionException() throws BadDefinitionException {
         //在处理函数中带参数的情况下将OnlyCare标记在函数上
         if (method.getParameterCount() >= 1 && method.isAnnotationPresent(OnlyCare.class)) {
-            throw new BadDefinitionException(BadDefinitionException.ONLYCARE_ERROR,
-                    method.toString());
+            throw new BadDefinitionException("请将OnlyCare标记在无参函数上，否则请写在参数前\n" +
+                    BadDefinitionException.ONLYCARE_ERROR, method.toString());
         }
         //将OnlyCare标记在了可变参数(Command类型或String[]类型)上
         if (isOnlyCareAnnotated() && parameterTypes != null) {
             for (int i = 0; i < parameterTypes.length; i++) {
                 if(getOnlyCareByParam(i) != null &&
                         CmdUtils.isVarTypes(parameterTypes[i])){
-                    throw new BadDefinitionException(BadDefinitionException.ONLYCARE_ERROR,
-                            method.toString());
+                    throw new BadDefinitionException("无法对参数类型" +
+                            parameterTypes[i].getSimpleName() + "做OnlyCare标记\n" +
+                            BadDefinitionException.ONLYCARE_ERROR, method.toString());
                 }
+            }
+        }
+        //将OnlyCare标记在函数上时参数为空
+        if (method.isAnnotationPresent(OnlyCare.class)) {
+            if (getOnlyCareByParam(0).length() == 0) {
+                throw new BadDefinitionException("OnlyCare参数为空\n" +
+                        BadDefinitionException.ONLYCARE_ERROR, method.toString());
             }
         }
         //将CmdDef注解与另外的三个注解混合使用
@@ -115,8 +123,9 @@ public class HandlingMethod {
             Class<? extends Annotation>[] annotations = CmdUtils.CMD_ANNOTATIONS;
             for (Class<? extends Annotation> annotation : annotations) {
                 if (method.isAnnotationPresent(annotation)) {
-                    throw new BadDefinitionException(BadDefinitionException.DECLARE_ERROR,
-                            method.toString());
+                    throw new BadDefinitionException("不允许将CmdDef注解与" + annotation.getSimpleName() +
+                            "注解混合使用\n" +
+                            BadDefinitionException.DECLARE_ERROR, method.toString());
                 }
             }
         }
