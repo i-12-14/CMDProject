@@ -28,6 +28,7 @@ public interface Analysable {
 	/**
 	 * @return 命令的集合
 	 */
+	@Deprecated
 	List<Command> getCommands();
 
     /**

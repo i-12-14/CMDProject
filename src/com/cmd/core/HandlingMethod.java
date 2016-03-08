@@ -2,6 +2,7 @@ package com.cmd.core;
 
 import com.cmd.annotations.CmdDef;
 import com.cmd.annotations.OnlyCare;
+import com.cmd.annotations.SingleParam;
 import com.cmd.utils.CmdUtils;
 
 import java.lang.annotation.Annotation;
@@ -35,13 +36,15 @@ public class HandlingMethod {
         this.method = method;
         //分析VariadicType的值
         variadicType = VariableType.TYPE_IMMUTABLE;
-        //检查处理函数参数类型是不是可变参数类型（Command类型或String数组类型）
+        //检查处理函数参数类型是不是可变参数类型（Command类型或String数组类型）或要将多参当一参处理
         if (method.getParameterCount() == 1) {
             Class<?> type = getParameterTypes()[0];
             if (type == String[].class) {
                 variadicType = VariableType.TYPE_STRING_ARRAY;
             } else if (type == Command.class) {
                 variadicType = VariableType.TYPE_COMMAND;
+            } else if (type == String.class && method.isAnnotationPresent(SingleParam.class)) {
+                variadicType = VariableType.TYPE_SINGLE_PARAM;
             }
         }
         //分析paramCount个数及OnlyCare的内容
@@ -129,6 +132,11 @@ public class HandlingMethod {
                 }
             }
         }
+        if (method.isAnnotationPresent(SingleParam.class)) {
+            if(method.getParameterCount() == 1 && method.getParameterTypes()[0] == String.class) ;
+            else throw new BadDefinitionException("SingleParam注解非法定义\n" +
+                    BadDefinitionException.DECLARE_ERROR, method.toString());
+        }
     }
 
     /**
@@ -215,7 +223,9 @@ public class HandlingMethod {
         TYPE_STRING_ARRAY,
         //Command类型
         TYPE_COMMAND,
-        //不是可变参数类型
-        TYPE_IMMUTABLE
+        //固定参数个数的类型
+        TYPE_IMMUTABLE,
+        //将多个参数合并为一个参数来处理
+        TYPE_SINGLE_PARAM;
     }
 }

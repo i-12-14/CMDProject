@@ -93,6 +93,10 @@ import com.cmd.utils.CmdUtils;
  * <p>
  * 如<code>@Description("null")</code>或<code>@CmdDef(description = "null")</code>
  * <p>
+ * 对于一参命令，当参数中带有分隔符时，我们可以将分隔符定义为null来解决这种冲突
+ * 但是还有一种更优雅的解决方案，在处理函数上添加<code>@SingleParam</code>即可实现相同的功能
+ * 同时依然可以使用自定义的分隔符来分割命令名与参数
+ * <p>
  * 我们提供了Outline注解用于阐明对于一个CommandName的总体性的概述，使用方式见类头注释
  * <p>
  * 一般来说CommandAnalyzer找到了一个能够处理一条命令的处理函数后，就不会继续去尝试调用其他的处理函数了
@@ -100,8 +104,7 @@ import com.cmd.utils.CmdUtils;
  * 调用{@code CommandAnalyzer#keepDispatch()}方法
  * <p>
  * 对于无参命令，请谨慎重载分隔符，请尽量避免在长度大于一的分隔符中出现转义字符
- *
- * @version 2.4
+ * @version 2.4.2
  * Created by congxiaoyao on 2016/2/19.
  */
 public class CommandAnalyzer implements Analysable {
@@ -493,15 +496,24 @@ public class CommandAnalyzer implements Analysable {
         int cmdParCnt = command.parameters == null ? 0 : command.parameters.length;
         //如果handlingMethod的参数个数与command中所保存的参数个数吻合
         HandlingMethod.VariableType variableType = handlingMethod.variadicType;
-        //检查处理函数上的参数是否为Command类型或String数组类型 如果是完成反射调用
+        //检查处理函数上的参数是否为Command类型或String数组类型或SingleParam 如果是完成反射调用
         if (variableType != HandlingMethod.VariableType.TYPE_IMMUTABLE) {
             if (command.parameters == null) command.parameters = new String[0];
             if (variableType == HandlingMethod.VariableType.TYPE_COMMAND) {
                 handlingMethod.method.invoke(handlingMethod.invoker, command);
                 return true;
-            } else {
+            } else if(variableType == HandlingMethod.VariableType.TYPE_STRING_ARRAY){
                 handlingMethod.method.invoke(handlingMethod.invoker, (Object) command.parameters);
                 return true;
+            } else if (variableType == HandlingMethod.VariableType.TYPE_SINGLE_PARAM) {
+                if (cmdParCnt != 0) {
+                    StringBuilder builder = new StringBuilder();
+                    for (String str : command.parameters) {
+                        builder.append(str).append(" ");
+                    }
+                    handlingMethod.method.invoke(handlingMethod.invoker, builder.toString());
+                    return true;
+                }
             }
         }
         //现在不存在可变参数的处理函数了，检查handlingMethod的参数个数与command中所保存的参数个数是否吻合
@@ -583,6 +595,7 @@ public class CommandAnalyzer implements Analysable {
         return false;
     }
 
+    @Deprecated
     @Override
     public List<Command> getCommands() {
         return commands;
