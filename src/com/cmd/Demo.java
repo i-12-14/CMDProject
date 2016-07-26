@@ -12,7 +12,6 @@ public class Demo {
 
 	private static FastAnalyzer analyzer;
 	private static CommandWindow window;
-
     public static void main(String[] args) {
         //创建一个CommandWindow实例并显示出来
         window = new CommandWindow().setVisible();
@@ -21,6 +20,7 @@ public class Demo {
 
         //绑定命令的处理函数所在的类的实例，可以是多个
         analyzer = FastAnalyzer.handleWith(new Demo());
+        //使CommandAnalyzer支持热加载
         analyzer.addHandlingObject(new DynamicCommandHandler(analyzer));
         analyzer.addHandlingObject(new HelpHandler(analyzer));
         analyzer.addHandlingObject(new CommandWindowHandler(window,analyzer));
